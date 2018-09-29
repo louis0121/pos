@@ -32,8 +32,8 @@ class VerifyProcessing(threading.Thread):
         self.logger.info(logcontent)
 
         # Start the second block generaton process
-#        generatethread = threading.Thread(target=self.__gendatablock)
-#        generatethread.start()
+        generatethread = threading.Thread(target=self.__gendatablock)
+        generatethread.start()
 
         # Receive data for this process to handle
         for each in glovar.ComList:
@@ -66,25 +66,25 @@ class VerifyProcessing(threading.Thread):
         if data['type'] == 'firstblock' and data['No'] == 3:
             # Verify whether it is commited by the committee member
             if (data['content']['commitnum'] >= glovar.Firstcommem//2+1):
-                logcontent = 'A valid commit firstblock:' + str(data['content']['block'][4]) + ' from comid:' + str(data['content']['comid'])
-                self.logger.info(logcontent)
+#                logcontent = 'A valid commit firstblock:' + str(data['content']['block'][4])
+#                self.logger.info(logcontent)
 
                 for each in glovar.ComList:
                     if self.cominfo[1] == each[1]:
-                        glovar.ComlistLock.acquire()
+                        each[5].acquire()
                         each[3]['commitblocklist'].append(data['content']['block'][4])
-                        glovar.ComlistLock.release()
-                        logcontent = 'Save a commit firstblock:' + str(data['content']['block'][4])
-                        self.logger.info(logcontent)
+                        each[5].release()
+#                        logcontent = 'Save a commit firstblock:' + str(data['content']['block'][4])
+#                        self.logger.info(logcontent)
 
         if data['type'] == 'secondblock' and data['No'] == 1:
-            logcontent = 'Handle a secondblock:' + str(data['messageid'])
-            self.logger.info(logcontent)
-            blockdata = json.loads(data['content'])
+#            logcontent = 'Handle a secondblock:' + str(data['messageid'])
+#            self.logger.info(logcontent)
+            blockdata = data['content']
 
             # Verify if the node is in our committee
             if blockdata[3] in self.cominfo[2]:
-                logcontent = 'Verify a secondblock:' + str(blockdata[1]) + 'from comid:' + str(blockdata[3]) + ' in committee:' +str(self.cominfo[0])
+                logcontent = 'Verify a secondblock:' + str(blockdata[1]) + 'from comid:' + str(blockdata[3])
                 self.logger.info(logcontent)
 
                 # Change the corresponding global status
@@ -116,8 +116,8 @@ class VerifyProcessing(threading.Thread):
                         each[5].release()
 
         if data['type'] == 'secondblock' and data['No'] == 2:
-            logcontent = 'Handle a second commitment:' + str(data['messageid'])
-            self.logger.info(logcontent)
+#            logcontent = 'Handle a second commitment:' + str(data['messageid'])
+#            self.logger.info(logcontent)
 
             # Verify whether it is commited by the committee member
             if data['content']['comid'] in self.cominfo[2]:
@@ -142,8 +142,8 @@ class VerifyProcessing(threading.Thread):
                             self.addBlock(each[3]['newsecondblock'][0])
 
         if data['type'] == 'secondblock' and data['No'] == 3:
-            logcontent = 'Handle a commit secondblock:' + str(data['content']['block'][1])
-            self.logger.info(logcontent)
+#            logcontent = 'Handle a commit secondblock:' + str(data['content']['block'][1])
+#            self.logger.info(logcontent)
 
             # Verify if the firstblock has received enough commitment from its committee
             listisin = True
@@ -157,6 +157,14 @@ class VerifyProcessing(threading.Thread):
 
                 for each in glovar.ComList:
                     if each[1] == self.cominfo[1]:
+                        # Delate the blockhash has been included in the
+                        # secondblock from commitblocklist
+                        each[5].acquire()
+                        for every in each[3]['commitblocklist']:
+                            if every in each[3]['newsecondblock'][0][6]:
+                                each[3]['commitblocklist'].remove(every)
+                        each[5].release()
+
                         self.addBlock(each[3]['newsecondblock'][0])
 
     def __gendatablock(self):
@@ -169,21 +177,24 @@ class VerifyProcessing(threading.Thread):
             if cur_time > prev_time:
                 # Select a leader to generate block 
                 self.logger.info('----------------------------------------')
-                logcontent('Choose a new leader to generate a secondblock')
+                logcontent = 'Choose a new leader to generate a secondblock'
                 self.logger.info(logcontent)
 
                 randomstring = "".join(str(self.cominfo[2]))
                 glovar.blockchainLock.acquire()
                 if len(glovar.BLOCKCHAIN):
-                    prevhash = glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)][0]
+                    prevhash = glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)-1][1]
                 else:
                     prevhash = 0
                 glovar.blockchainLock.release()
                 randomstring += str(prevhash)
+
+                logcontent = "randomstring:" + str(randomstring)
+                self.logger.info(logcontent)
                 idchoose = int(hashlib.sha256(randomstring.encode('utf-8')).hexdigest(), 16) % len(self.cominfo[2])
 
-                logcontent = str(idchoose+1) + ' member: ' + str(self.cominfo[idchoose]) + ' is chosen to generate a \
-                        final block'
+                logcontent = str(idchoose+1) + ' member: ' + \
+                str(self.cominfo[2][idchoose]) + ' is chosen to generate a second lock'
                 self.logger.info(logcontent)
 
                 # Self is selected
@@ -209,8 +220,7 @@ class VerifyProcessing(threading.Thread):
                             each[3]['newsecondblock'].append(newblock)
                             each[5].release()
 
-                    json_block = json.dumps(newblock)
-                    senddata = {'messageid':hashvalue,'type':'secondblock','No':1,'content':json_block}
+                    senddata = {'messageid':hashvalue,'type':'secondblock','No':1,'content':newblock}
                     glovar.messageLock.acquire()
                     glovar.MessageList.append(hashvalue)
                     glovar.messageLock.release()
@@ -236,6 +246,9 @@ class VerifyProcessing(threading.Thread):
             for each in glovar.ComList:
                 if self.cominfo[0] == each[0] and self.cominfo[1] == each[1]:
                     stillin = True
+
+        logcontent = "The secondblock generation pocess id ended"
+        self.logger.info(logcontent)
 
     # Broad the commit secondblock
     def broadSecondCommitBlock(self):
@@ -265,15 +278,15 @@ class VerifyProcessing(threading.Thread):
     def addBlock(self, block):
         glovar.blockchainLock.acquire()
         if len(glovar.BLOCKCHAIN):
-            if glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)-1] != block[1]:
+            if glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)-1][1] != block[1]:
                 glovar.BLOCKCHAIN.append(block)
-                logcontent = 'Add a firstblock to the chain'
+                logcontent = 'Add a secondblock to the chain'
                 self.logger.info(logcontent)
         else:
-            glovar.FIRSTBLOCKCHAIN.append(block)
-            logcontent = 'Add a firstblock to the chain'
+            glovar.BLOCKCHAIN.append(block)
+            logcontent = 'Add a secondblock to the chain'
             self.logger.info(logcontent)
-        glovar.firstchainLock.release()
+        glovar.blockchainLock.release()
 
         # Change the status of committee member
         for each in glovar.ComList:
