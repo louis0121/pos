@@ -16,22 +16,25 @@ from comselect import *
 from msghandle import *
 from network import *
 from committee_generator import *
+from tpsmeasure import *
 
 # main function
 def main():
     if len(sys.argv) < 4:
-        print('Lack of parameters: logdirectory or clientconf or bindport!')
+        print('Lack of parameters: logdirectory or bindport!')
         pwd = os.getcwd()
         logdirectory = pwd + '/log/1/'
-        clientconf = pwd + '/log/1/bitcoin.conf'
+#        clientconf = pwd + '/log/1/bitcoin.conf'
         bindport = 18000
         glovar.NodeId = 1
-        print('Use the default logdirectory, clientconf and bindport.\n',logdirectory,'\n',clientconf,'\n',bindport)
+        meanode = 0
+        print('Use the default logdirectory and bindport.\n',logdirectory,'\n',bindport)
     else:
         logdirectory = sys.argv[1]
-        clientconf = sys.argv[2]
-        bindport = int(sys.argv[3])
-        glovar.NodeId = int(sys.argv[4])
+#        clientconf = sys.argv[2]
+        bindport = int(sys.argv[2])
+        glovar.NodeId = int(sys.argv[3])
+        meanode = int(sys.argv[4])
 
     # Read the configuration file and config network
     cf = configparser.ConfigParser()
@@ -70,17 +73,10 @@ def main():
     new_comgeneration = CommitteeGeneration(logdirectory)
     new_comgeneration.start()
 
-#        blockgenprocess = BlockGeneration(logdirectory)
-#        blockgenprocess.start()
-#        
-#        outputlog = BlockchainShow(logdirectory)
-#        outputlog.start()
-#        
-#        chain_handle = Queuehandle(logdirectory)
-#        chain_handle.start()
-#        
-#        datablock_gen = Datablock(logdirectory, clientconf)
-#        datablock_gen.start()
+    if meanode:
+#        print('NodeId: ', glovar.NodeId, ' is a tps measure node.')
+        tpsprocess = TpsMeasure(logdirectory)
+        tpsprocess.start()
 
 # Execute as main program
 if __name__ == '__main__':
