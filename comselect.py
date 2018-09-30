@@ -54,9 +54,6 @@ class RanselectProcessing(threading.Thread):
         glovar.ranLock.acquire()
         glovar.RanList.clear()
         glovar.ranLock.release()
-#        glovar.messageLock.acquire()
-#        glovar.MessageList.clear()
-#        glovar.messageLock.release()
         glovar.hashLock.acquire()
         glovar.HashSeed = 0
         glovar.HashList.clear()
