@@ -16,7 +16,7 @@ class VerifyProcessing(threading.Thread):
         self.logdirectory = logdirectory
 
     def run(self):
-        filename = self.logdirectory + 'PoSnodelog.txt'
+        filename = self.logdirectory + 'verifylog.txt'
         self.logger = logging.getLogger(str(self.cominfo[1]))
         self.logger.setLevel(level = logging.INFO)
         handler = logging.FileHandler(filename)
@@ -48,13 +48,15 @@ class VerifyProcessing(threading.Thread):
                         time.sleep(0.05)
 
                     # Check if the PoS node is still in the verify committee
-                    stillin = False
-                    for every in glovar.ComList:
-                        if comid == every[1] and every[0] == incomno:
-                            stillin = True
-                    if not stillin:
+#                    stillin = False
+#                    for every in glovar.ComList:
+#                        if comid == every[1] and every[0] == incomno:
+#                            stillin = True
+#                    if not stillin:
 #                        logcontent = 'stillin:' + str(stillin)
 #                        self.logger.info(logcontent)
+                    if glovar.ComChange:
+                        each[6] = 0
                         break
 
         # End the process
@@ -71,9 +73,10 @@ class VerifyProcessing(threading.Thread):
 
                 for each in glovar.ComList:
                     if self.cominfo[1] == each[1]:
-                        each[5].acquire()
-                        each[3]['commitblocklist'].append(data['content']['block'][4])
-                        each[5].release()
+                        if data['content']['block'][4] not in each[3]['addfirstlist']:
+                            each[5].acquire()
+                            each[3]['commitblocklist'].append(data['content']['block'][4])
+                            each[5].release()
 #                        logcontent = 'Save a commit firstblock:' + str(data['content']['block'][4])
 #                        self.logger.info(logcontent)
 
@@ -160,12 +163,26 @@ class VerifyProcessing(threading.Thread):
                         # Delate the blockhash has been included in the
                         # secondblock from commitblocklist
                         each[5].acquire()
+#                        logcontent = "each[3]['commitblocklist']:" + str(each[3]['commitblocklist'])
+#                        self.logger.info(logcontent)
+#                        logcontent = "data['content']['block'][6]:" + str(data['content']['block'][6])
+#                        self.logger.info(logcontent)
+                        templist = []
                         for every in each[3]['commitblocklist']:
-                            if every in each[3]['newsecondblock'][0][6]:
-                                each[3]['commitblocklist'].remove(every)
+                            if every not in data['content']['block'][6]:
+                                templist.append(every)
+
+                        each[3]['commitblocklist'] = templist.copy()
+
+                        each[3]['addfirstlist'].extend(data['content']['block'][6])
+#                        logcontent = "each[3]['addfirstlist']:" + str(each[3]['addfirstlist'])
+#                        self.logger.info(logcontent)
+#                        logcontent = "each[3]['commitblocklist']:" + str(each[3]['commitblocklist'])
+#                        self.logger.info(logcontent)
                         each[5].release()
 
-                        self.addBlock(each[3]['newsecondblock'][0])
+#                        self.addBlock(each[3]['newsecondblock'][0])
+                        self.addBlock(data['content']['block'])
 
     def __gendatablock(self):
 
@@ -194,7 +211,7 @@ class VerifyProcessing(threading.Thread):
                 idchoose = int(hashlib.sha256(randomstring.encode('utf-8')).hexdigest(), 16) % len(self.cominfo[2])
 
                 logcontent = str(idchoose+1) + ' member: ' + \
-                str(self.cominfo[2][idchoose]) + ' is chosen to generate a second lock'
+                str(self.cominfo[2][idchoose]) + ' is chosen to generate a second block'
                 self.logger.info(logcontent)
 
                 # Self is selected
@@ -206,6 +223,8 @@ class VerifyProcessing(threading.Thread):
                             transactionlist = each[3]['transactionlist']
                             each[3]['commitblocklist'].clear()
                             each[3]['verify'] = 1
+                            logcontent = "each[3]['commitblocklist']:" + str(len(each[3]['commitblocklist']))
+                            self.logger.info(logcontent)
                             each[5].release()
 
                     timestamp = time.time()

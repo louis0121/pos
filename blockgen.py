@@ -86,13 +86,15 @@ class BlockProcessing(threading.Thread):
                     except queue.Empty:
                         time.sleep(0.05)
 
-                    stillin = False
-                    for every in glovar.ComList:
-                        if comid == every[1] and every[0] == incomno:
-                            stillin = True
-                    if not stillin:
+#                    stillin = False
+#                    for every in glovar.ComList:
+#                        if comid == every[1] and every[0] == incomno:
+#                            stillin = True
+#                    if not stillin:
 #                        logcontent = 'Stop current process, stillin:' + str(stillin)
 #                        self.logger.info(logcontent)
+                    if glovar.ComChange:
+                        each[6] = 0
                         break
         # End the process
         logcontent = 'The process is ended.'
@@ -185,7 +187,7 @@ class BlockProcessing(threading.Thread):
 
                     for each in glovar.ComList:
                         if each[1] == self.cominfo[1]:
-                            self.addBlock(each[3]['newblock'][0])
+                            self.addBlock(data['content']['block'])
 
             else:
                 logcontent = "Unkown data with data['type']:firstblock"

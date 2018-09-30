@@ -62,7 +62,7 @@ class RanselectProcessing(threading.Thread):
         glovar.HashList.clear()
         glovar.hashLock.release()
         glovar.PosList.clear()
-        glovar.ComList.clear()
+#        glovar.ComList.clear()
 
 
         cur_time = int(time.time())
@@ -156,6 +156,21 @@ class RanselectProcessing(threading.Thread):
 #        logcontent = 'Secondcommem: ' + str(glovar.Secondcommem)
 #        self.logger.info(logcontent)
 
+        # Inform other PoS node process to stop
+        glovar.ComChange = 1
+        notend = True
+        while notend:
+            notend = False
+            for each in glovar.ComList:
+                if each[6]:
+                    notend = True
+                    break
+
+            time.sleep(0.05)
+
+        glovar.ComList.clear()
+        glovar.ComChange = 0
+
         # Record the status of committee
         for i in range (nodenum):
             if (glovar.PosList[i] > glovar.Stakemin and glovar.PosList[i] <= glovar.Stakemax):
@@ -168,16 +183,19 @@ class RanselectProcessing(threading.Thread):
                 newblock = []
                 commitlist = []
                 commitblocklist = []
+                addfirstlist = []
                 transactionlist = []
                 secondcommitlist = []
                 newsecondblock = []
                 comstatus = {'genblock':0, 'blockhash':'0', 'stage':0, 'commit':0, 'commitlist':commitlist, \
                         'newblock':newblock, 'verify':0, 'commitblocklist':commitblocklist, \
                         'transactionlist':transactionlist, 'secondblockhash':'0', \
-                        'secondcommit':0, 'secondcommitlist':secondcommitlist, 'newsecondblock':newsecondblock}
+                        'secondcommit':0, 'secondcommitlist':secondcommitlist, \
+                        'newsecondblock':newsecondblock, 'addfirstlist':addfirstlist}
                 comnodequeue = queue.Queue()
                 commemberLock = threading.Lock()
-                cominfo = [incomno, glovar.PosList[i], commember, comstatus, comnodequeue, commemberLock]
+                process = 1
+                cominfo = [incomno, glovar.PosList[i], commember, comstatus, comnodequeue, commemberLock, process]
                 glovar.ComList.append(cominfo)
 
         self.logger.info('--------------------------------------------')
