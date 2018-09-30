@@ -14,7 +14,7 @@ class BlockProcessing(threading.Thread):
         self.logdirectory = logdirectory
 
     def run(self):
-        filename = self.logdirectory + 'msghandlelog.txt'
+        filename = self.logdirectory + 'PoSnodelog.txt'
         self.logger = logging.getLogger(str(self.cominfo[1]))
         self.logger.setLevel(level = logging.INFO)
         handler = logging.FileHandler(filename)

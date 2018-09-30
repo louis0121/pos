@@ -18,7 +18,7 @@ class RanselectProcessing(threading.Thread):
 
     def run(self):
         # Config the directory of log file
-        filename = self.logdirectory + 'msghandlelog.txt'
+        filename = self.logdirectory + 'PoSnodelog.txt'
         self.logger = logging.getLogger('RanselectProcessing')
         self.logger.setLevel(level = logging.INFO)
         handler = logging.FileHandler(filename)

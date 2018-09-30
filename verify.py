@@ -16,7 +16,7 @@ class VerifyProcessing(threading.Thread):
         self.logdirectory = logdirectory
 
     def run(self):
-        filename = self.logdirectory + 'msghandlelog.txt'
+        filename = self.logdirectory + 'PoSnodelog.txt'
         self.logger = logging.getLogger(str(self.cominfo[1]))
         self.logger.setLevel(level = logging.INFO)
         handler = logging.FileHandler(filename)
@@ -247,7 +247,7 @@ class VerifyProcessing(threading.Thread):
                 if self.cominfo[0] == each[0] and self.cominfo[1] == each[1]:
                     stillin = True
 
-        logcontent = "The secondblock generation pocess id ended"
+        logcontent = "The secondblock generation pocess is ended"
         self.logger.info(logcontent)
 
     # Broad the commit secondblock
