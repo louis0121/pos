@@ -57,6 +57,7 @@ class ConnectedNode(threading.Thread):
                 
         except Exception as e:
             self.logger.info(e)
+            raise
             
         finally:
  #           logcontent = 'remove self.addr:' + str(self.addr)

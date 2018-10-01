@@ -156,8 +156,8 @@ class msghandle(threading.Thread):
             # This node has send a transaction waiting for confirmation
             if len(glovar.TransactionList):
                 glovar.FirstQueue.put(data)
-#                logcontent = "Check the firstblock for confirmation:" + str(data['content']['block'][4])
-#                self.logger.info(logcontent)
+                logcontent = "Check the firstblock for confirmation:" + str(data['content']['block'][4])
+                self.logger.info(logcontent)
 
         else:
             logcontent = "Unkown data['type']:firsblock"

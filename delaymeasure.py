@@ -98,19 +98,19 @@ class DelayMeasure(threading.Thread):
 
         notfind = True
         while notfind:
-            try:
-                data = glovar.FirstQueue.get_nowait()
-#                logcontent = 'VerifyProcessing get a message:' + str(data)
-#                self.logger.info(logcontent)
-                translist = data['content']['block'][5]
-                for each in translist:
-                    if hashvalue == each[0]:
-                        end_time = time.time()
-                        notfind = False
-                        break
+#            try:
+            data = glovar.FirstQueue.get()
+            logcontent = 'Check a firstblock:' + str(data['content']['block'][4])
+            self.logger.info(logcontent)
+            translist = data['content']['block'][5]
+            for each in translist:
+                if hashvalue == each[0]:
+                    end_time = time.time()
+                    notfind = False
+                    break
 
-            except queue.Empty:
-                time.sleep(0.05)
+#            except queue.Empty:
+#                time.sleep(0.05)
 
         firstlatency = end_time - start_time
         logcontent = "Transaction:" + str(hashvalue) + " first latency:" + str(firstlatency)

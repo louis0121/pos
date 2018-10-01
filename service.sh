@@ -67,8 +67,11 @@ do
     mkdir $logpath 
     touch $logpath/clicf.ini
     port1=`expr $startport + $i - 1`
-    #port2=`expr $startport + $i + 1`
-    filecontent="[baseconf]\nnodenumber=1\nhost1=localhost\nport1=$port1\nstakesum=$stakesum\nstakemin=$stakemin\nstakemax=$stakemax\nfirstcommem=$firstcommem\nfirstcomno=$firstcomno\nsecondcommem=$secondcommem"
+    port2=`expr $startport + $i - 3`
+    port3=`expr $startport + $i - 5`
+    port4=`expr $startport + $i - 9`
+    port5=`expr $startport + $i - 11`
+    filecontent="[baseconf]\nnodenumber=5\nhost1=localhost\nport1=$port1\nhost2=localhost\nport2=$port2\nhost3=localhost\nport3=$port3\nhost4=localhost\nport4=$port4\nhost5=localhost\nport5=$port5\nstakesum=$stakesum\nstakemin=$stakemin\nstakemax=$stakemax\nfirstcommem=$firstcommem\nfirstcomno=$firstcomno\nsecondcommem=$secondcommem"
     echo -e $filecontent > ./log/$i/clicf.ini
     ./minernode.py $logpath $clientport $i 1 &
    # sleep 0.1 
