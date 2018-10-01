@@ -31,16 +31,16 @@ class UpdateList(threading.Thread):
         cur_time = int(time.time())
         prev_time = cur_time - ( cur_time % interval ) + interval
         while True:
-            cur_time = int(time.time())
+#            cur_time = int(time.time())
             if len(glovar.MessageList) > listnum:
                 glovar.messageLock.acquire()
                 glovar.MessageList.pop(0)
                 glovar.messageLock.release()
 
-            if cur_time > prev_time:
-                logcontent = "MessageList:" + str(len(glovar.MessageList)) + "\n" + str(glovar.MessageList)
-                self.logger.info(logcontent)
-                prev_time += interval
+#            if cur_time > prev_time:
+#                logcontent = "MessageList:" + str(len(glovar.MessageList))# + "\n" + str(glovar.MessageList)
+#                self.logger.info(logcontent)
+#                prev_time += interval
 
-            time.sleep(0.03)
+            time.sleep(0.05)
 

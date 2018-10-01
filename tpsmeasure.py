@@ -45,9 +45,9 @@ class TpsMeasure(threading.Thread):
                 firstblocknum = 0
                 for each in blocklist:
                     firstblocknum += len(each[6])
-                    logcontent = "This block cotains:" + str(len(each[6])) + \
-                            " first blocks\n"# + str(each)
-                    self.logger.info(logcontent)
+#                    logcontent = "This block cotains:" + str(len(each[6])) + \
+#                            " first blocks\n"# + str(each)
+#                    self.logger.info(logcontent)
 
                 transactionsum = 4200 * firstblocknum
                 tps = transactionsum / (date_stamp - start_time)

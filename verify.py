@@ -80,7 +80,7 @@ class VerifyProcessing(threading.Thread):
 
             # Verify if the node is in our committee
             if blockdata[3] in self.cominfo[2]:
-                logcontent = 'Verify a secondblock:' + str(blockdata[1]) + 'from comid:' + str(blockdata[3])
+                logcontent = 'Verify a secondblock:' + str(blockdata[1]) + ' from comid:' + str(blockdata[3])
                 self.logger.info(logcontent)
 
                 # Change the corresponding global status
@@ -127,13 +127,13 @@ class VerifyProcessing(threading.Thread):
                         each[3]['secondcommit'] += 1
                         each[3]['secondcommitlist'].append(data['content']['comid'])
                         each[5].release()
-                        logcontent = 'Secondblock:' + str(each[3]['secondblockhash']) + ' receive a commit. Total:' + str(each[3]['secondcommit'])
-                        self.logger.info(logcontent)
+#                        logcontent = 'Secondblock:' + str(each[3]['secondblockhash']) + ' receive a commit. Total:' + str(each[3]['secondcommit'])
+#                        self.logger.info(logcontent)
 
                         # Receive enough commitment
                         if (each[3]['secondcommit'] >= glovar.Secondcommem//2+1):
-                            logcontent = 'Receive enough commitment for blocblock:' + str(each[3]['secondblockhash'])
-                            self.logger.info(logcontent)
+#                            logcontent = 'Receive enough commitment for blocblock:' + str(each[3]['secondblockhash'])
+#                            self.logger.info(logcontent)
                             self.broadSecondCommitBlock()
                             self.addBlock(each[3]['newsecondblock'][0])
 
@@ -181,7 +181,6 @@ class VerifyProcessing(threading.Thread):
 #                        self.logger.info(logcontent)
                         each[5].release()
 
-#                        self.addBlock(each[3]['newsecondblock'][0])
                         self.addBlock(data['content']['block'])
 
     def __gendatablock(self):
@@ -194,8 +193,8 @@ class VerifyProcessing(threading.Thread):
             if cur_time > prev_time:
                 # Select a leader to generate block 
                 self.logger.info('----------------------------------------')
-                logcontent = 'Choose a new leader to generate a secondblock'
-                self.logger.info(logcontent)
+#                logcontent = 'Choose a new leader to generate a secondblock'
+#                self.logger.info(logcontent)
 
                 randomstring = "".join(str(self.cominfo[2]))
                 glovar.blockchainLock.acquire()
@@ -206,8 +205,8 @@ class VerifyProcessing(threading.Thread):
                 glovar.blockchainLock.release()
                 randomstring += str(prevhash)
 
-                logcontent = "randomstring:" + str(randomstring)
-                self.logger.info(logcontent)
+#                logcontent = "randomstring:" + str(randomstring)
+#                self.logger.info(logcontent)
                 idchoose = int(hashlib.sha256(randomstring.encode('utf-8')).hexdigest(), 16) % len(self.cominfo[2])
 
                 logcontent = str(idchoose+1) + ' member: ' + \
@@ -224,8 +223,8 @@ class VerifyProcessing(threading.Thread):
                             each[3]['commitblocklist'].clear()
                             each[3]['transactionlist'].clear()
                             each[3]['verify'] = 1
-                            logcontent = "each[3]['commitblocklist']:" + str(len(each[3]['commitblocklist']))
-                            self.logger.info(logcontent)
+#                            logcontent = "each[3]['commitblocklist']:" + str(len(each[3]['commitblocklist']))
+#                            self.logger.info(logcontent)
                             each[5].release()
 
                     timestamp = time.time()
@@ -263,7 +262,10 @@ class VerifyProcessing(threading.Thread):
 
             # Check if the PoS node is still in the verify committee
             if glovar.ComChange:
-                each[6] = 0
+                for each in glovar.ComList:
+                    if self.cominfo[1] == each[1]:
+                        each[6] = 0
+                        break
                 break
 
         logcontent = "The secondblock generation pocess is ended"

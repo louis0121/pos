@@ -100,8 +100,8 @@ class DelayMeasure(threading.Thread):
         while notfind:
 #            try:
             data = glovar.FirstQueue.get()
-            logcontent = 'Check a firstblock:' + str(data['content']['block'][4])
-            self.logger.info(logcontent)
+#            logcontent = 'Check a firstblock:' + str(data['content']['block'][4])
+#            self.logger.info(logcontent)
             translist = data['content']['block'][5]
             for each in translist:
                 if hashvalue == each[0]:

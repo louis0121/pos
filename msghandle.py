@@ -156,8 +156,8 @@ class msghandle(threading.Thread):
             # This node has send a transaction waiting for confirmation
             if len(glovar.TransactionList):
                 glovar.FirstQueue.put(data)
-                logcontent = "Check the firstblock for confirmation:" + str(data['content']['block'][4])
-                self.logger.info(logcontent)
+#                logcontent = "Check the firstblock for confirmation:" + str(data['content']['block'][4])
+#                self.logger.info(logcontent)
 
         else:
             logcontent = "Unkown data['type']:firsblock"
@@ -204,9 +204,10 @@ class msghandle(threading.Thread):
             # This node is selected in any committee
             if len(glovar.ComList):
                 for each in glovar.ComList:
-                    each[5].acquire()
-                    each[4].put(data)
-                    each[5].release()
+                    if each[0] == glovar.Firstcomno + 1:
+                        each[5].acquire()
+                        each[4].put(data)
+                        each[5].release()
 #                        logcontent = 'transmit a commit firstblock to generation committee'
 #                        self.logger.info(logcontent)
             else:
