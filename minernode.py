@@ -17,6 +17,7 @@ from msghandle import *
 from network import *
 from committee_generator import *
 from tpsmeasure import *
+from delaymeasure import *
 
 # main function
 def main():
@@ -77,6 +78,9 @@ def main():
 #        print('NodeId: ', glovar.NodeId, ' is a tps measure node.')
         tpsprocess = TpsMeasure(logdirectory)
         tpsprocess.start()
+
+        delayprocess = DelayMeasure(logdirectory)
+        delayprocess.start()
 
 # Execute as main program
 if __name__ == '__main__':

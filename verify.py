@@ -76,6 +76,7 @@ class VerifyProcessing(threading.Thread):
                         if data['content']['block'][4] not in each[3]['addfirstlist']:
                             each[5].acquire()
                             each[3]['commitblocklist'].append(data['content']['block'][4])
+                            each[3]['transactionlist'].extend(data['content']['block'][5])
                             each[5].release()
 #                        logcontent = 'Save a commit firstblock:' + str(data['content']['block'][4])
 #                        self.logger.info(logcontent)
@@ -174,6 +175,13 @@ class VerifyProcessing(threading.Thread):
 
                         each[3]['commitblocklist'] = templist.copy()
 
+                        temptranslist = []
+                        for every in each[3]['transactionlist']:
+                            if every not in data['content']['block'][7]:
+                                temptranslist.append(every)
+
+                        each[3]['transactionlist'] = temptranslist.copy()
+
                         each[3]['addfirstlist'].extend(data['content']['block'][6])
 #                        logcontent = "each[3]['addfirstlist']:" + str(each[3]['addfirstlist'])
 #                        self.logger.info(logcontent)
@@ -220,8 +228,9 @@ class VerifyProcessing(threading.Thread):
                         if self.cominfo[1] == each[1]:
                             each[5].acquire()
                             commitblocklist = each[3]['commitblocklist'].copy()
-                            transactionlist = each[3]['transactionlist']
+                            transactionlist = each[3]['transactionlist'].copy()
                             each[3]['commitblocklist'].clear()
+                            each[3]['transactionlist'].clear()
                             each[3]['verify'] = 1
                             logcontent = "each[3]['commitblocklist']:" + str(len(each[3]['commitblocklist']))
                             self.logger.info(logcontent)
@@ -261,10 +270,13 @@ class VerifyProcessing(threading.Thread):
                 time.sleep(0.2)
 
             # Check if the PoS node is still in the verify committee
-            stillin = False
-            for each in glovar.ComList:
-                if self.cominfo[0] == each[0] and self.cominfo[1] == each[1]:
-                    stillin = True
+            # stillin = False
+            # for each in glovar.ComList:
+            #    if self.cominfo[0] == each[0] and self.cominfo[1] == each[1]:
+            #        stillin = True
+            if glovar.ComChange:
+                each[6] = 0
+                break
 
         logcontent = "The secondblock generation pocess is ended"
         self.logger.info(logcontent)

@@ -39,8 +39,32 @@ class BlockProcessing(threading.Thread):
         # Self is selected
         transactions = []
         if comid == commember[idchoose]:
-            transactionContent = [comid, 0.1]
-            transactions.append(transactionContent)
+            # Add transactions into the new block
+            for each in glovar.ComList:
+                if comid == each[1]:
+                    # If the PoS node has received transactions
+                    if len(each[3]['transactionlist']):
+                        for every in each[3]['transactionlist']:
+                            transactions.append(every)
+                        each[3]['transactionlist'].clear()
+
+                    # Create a new transaction to add 
+                    else:
+                        trans_input_no = 1
+                        trans_input_item = ['abc']
+                        trans_input = [trans_input_no, trans_input_item]
+
+                        trans_output_no = 1
+                        trans_output_output1 = ['efg', 5]
+                        trans_output_item = [trans_output_output1]
+                        trans_output = [trans_output_no, trans_output_item]
+                        timestamp = time.time()
+                        temptransaction = [trans_input, trans_output, timestamp]
+                        temp = str(temptransaction)
+                        hashvalue = hashlib.sha256(temp.encode('utf-8')).hexdigest()
+                        newtransaction = [hashvalue, trans_input, trans_output, timestamp]
+                        transactions.append(newtransaction)
+
             timestamp = time.time()
             temp = str(incomno) + str(comid) + str(commember) + str(timestamp)+ str(transactions)
             hashvalue = hashlib.sha256(temp.encode('utf-8')).hexdigest()
@@ -49,7 +73,7 @@ class BlockProcessing(threading.Thread):
 
             senddata = {'messageid':hashvalue,'type':'firstblock','No':1,'content':json_block}
             # Wait for other Pos node to start up receive process
-            time.sleep(1)
+            time.sleep(3)
             glovar.messageLock.acquire()
             glovar.MessageList.append(hashvalue)
             glovar.messageLock.release()
@@ -76,6 +100,7 @@ class BlockProcessing(threading.Thread):
                             every[4].put(senddata)
                             glovar.ComlistLock.release()
 
+        # Get message from its queue belong to this PoS node
         for each in glovar.ComList:
             if comid == each[1]:
                 while True:
@@ -95,6 +120,8 @@ class BlockProcessing(threading.Thread):
 #                    if not stillin:
 #                        logcontent = 'Stop current process, stillin:' + str(stillin)
 #                        self.logger.info(logcontent)
+
+                    # Check if the committee has changed
                     if glovar.ComChange:
                         each[6] = 0
                         break
@@ -104,6 +131,14 @@ class BlockProcessing(threading.Thread):
 
     # Handle message for the generation committee
     def dataHandle(self, data):
+        if data['type'] == 'transaction':
+            logcontent = "Handle a transaction:" + str(data['messageid'])
+            self.logger.info(logcontent)
+
+            for each in glovar.ComList:
+                if self.cominfo[1] == each[1]:
+                    each[3]['transactionlist'].append(data['content'])
+
         if data['type'] == 'firstblock':
             # Verify whether it is commited by the committee member
             if data['No'] == 1:
@@ -119,9 +154,9 @@ class BlockProcessing(threading.Thread):
                     # Change the corresponding global status
                     for each in glovar.ComList:
                         if self.cominfo[1] == each[1]:
-                            glovar.ComlistLock.acquire()
+                            # glovar.ComlistLock.acquire()
                             each[3]['newblock'].append(blockdata)
-                            glovar.ComlistLock.release()
+                            # glovar.ComlistLock.release()
 
                     # Send a commitment message
                     content = {'blockhash':blockdata[4],'incomno':blockdata[0],'comid':self.cominfo[1],'commit':1}
@@ -140,9 +175,9 @@ class BlockProcessing(threading.Thread):
                     # Check if there is another PoS in the same committee
                     for each in glovar.ComList:
                         if each[0] == self.cominfo[0] and each[1] != self.cominfo[1]:
-                            glovar.ComlistLock.acquire()
+                            each[5].acquire()
                             each[4].put(senddata)
-                            glovar.ComlistLock.release()
+                            each[5].release()
 
             elif data['No'] ==2:
 #                logcontent = 'Handle a commitment:' + str(data['messageid'])
@@ -189,6 +224,13 @@ class BlockProcessing(threading.Thread):
 
                     for each in glovar.ComList:
                         if each[1] == self.cominfo[1]:
+                            if len(each[3]['transactionlist']):
+                                temptransactions = []
+                                for every in each[3]['transactionlist']:
+                                    if every not in data['content']['block'][5]:
+                                        temptransactions.append(every)
+                                each[3]['transactionlist'] = temptransactions.copy()
+
                             self.addBlock(data['content']['block'])
 
             else:
@@ -285,8 +327,32 @@ class BlockProcessing(threading.Thread):
         # Self is selected
         transactions = []
         if comid == commember[idchoose]:
-            transactionContent = [comid, 0.1]
-            transactions.append(transactionContent)
+            # Add transactions into the new block
+            for each in glovar.ComList:
+                if comid == each[1]:
+                    # If the PoS node has received transactions
+                    if len(each[3]['transactionlist']):
+                        for every in each[3]['transactionlist']:
+                            transactions.append(every)
+                        each[3]['transactionlist'].clear()
+
+                    # Create a new transaction to add 
+                    else:
+                        trans_input_no = 1
+                        trans_input_item = ['abc']
+                        trans_input = [trans_input_no, trans_input_item]
+
+                        trans_output_no = 1
+                        trans_output_output1 = ['efg', 5]
+                        trans_output_item = [trans_output_output1]
+                        trans_output = [trans_output_no, trans_output_item]
+                        timestamp = time.time()
+                        temptransaction = [trans_input, trans_output, timestamp]
+                        temp = str(temptransaction)
+                        hashvalue = hashlib.sha256(temp.encode('utf-8')).hexdigest()
+                        newtransaction = [hashvalue, trans_input, trans_output, timestamp]
+                        transactions.append(newtransaction)
+
             timestamp = time.time()
             temp = str(incomno) + str(comid) + str(commember) + str(timestamp)+ str(transactions)
             hashvalue = hashlib.sha256(temp.encode('utf-8')).hexdigest()
@@ -315,6 +381,6 @@ class BlockProcessing(threading.Thread):
                     for every in glovar.ComList:
                         if (every[0] == incomno and every[1] != comid):
                             # Send data to this PoS node process
-                            glovar.ComlistLock.acquire()
+                            each[5].acquire()
                             every[4].put(senddata)
-                            glovar.ComlistLock.release()
+                            each[5].release()

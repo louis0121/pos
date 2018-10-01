@@ -39,6 +39,7 @@ PosList = []
 ComList = []
 ComlistLock = threading.Lock()
 ComChange = 0
+TransactionList = []
 
 NewComList = []
 newComLock = threading.Lock()
