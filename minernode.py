@@ -15,9 +15,10 @@ import glovar, configparser
 from comselect import *
 from msghandle import *
 from network import *
-from committee_generator import *
+# from committee_generator import *
 from tpsmeasure import *
 from delaymeasure import *
+from updatelist import *
 
 # main function
 def main():
@@ -71,8 +72,10 @@ def main():
     time.sleep(3)
     user_comselection = RanselectProcessing(logdirectory)
     user_comselection.start()
-    new_comgeneration = CommitteeGeneration(logdirectory)
-    new_comgeneration.start()
+#    new_comgeneration = CommitteeGeneration(logdirectory)
+#    new_comgeneration.start()
+    delatelist = UpdateList(logdirectory)
+    delatelist.start()
 
     if meanode:
 #        print('NodeId: ', glovar.NodeId, ' is a tps measure node.')

@@ -27,13 +27,13 @@ class TpsMeasure(threading.Thread):
 
         time.sleep(INIWAIT_TIME + 2*RANBROAD_TIME + 10)
 
-        date_stamp = int(time.time())
+        start_time = time.time()
+        date_stamp = int(start_time)
         prev_time = date_stamp - (date_stamp % MEASURE_INTERVAL) + MEASURE_INTERVAL + 4
-        start_time = date_stamp
         start_length = len(glovar.BLOCKCHAIN)
 
         while True:
-            date_stamp = int(time.time())
+            date_stamp = time.time()
             if date_stamp > prev_time:
                 end_length = len(glovar.BLOCKCHAIN)
                 logcontent = "Start time: " + str(start_time) + " End time: " \
@@ -46,7 +46,7 @@ class TpsMeasure(threading.Thread):
                 for each in blocklist:
                     firstblocknum += len(each[6])
                     logcontent = "This block cotains:" + str(len(each[6])) + \
-                            " first blocks\n" + str(each)
+                            " first blocks\n"# + str(each)
                     self.logger.info(logcontent)
 
                 transactionsum = 4200 * firstblocknum

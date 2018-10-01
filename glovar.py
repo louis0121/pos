@@ -40,6 +40,7 @@ ComList = []
 ComlistLock = threading.Lock()
 ComChange = 0
 TransactionList = []
+FirstQueue = queue.Queue()
 
 NewComList = []
 newComLock = threading.Lock()
@@ -57,6 +58,7 @@ FIRSTBLOCKCHAIN = []
 firstchainLock = threading.Lock()
 BLOCKCHAIN = []
 blockchainLock = threading.Lock()
+
 ####################################
 
 threadLock = threading.Lock()

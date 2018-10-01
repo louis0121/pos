@@ -47,14 +47,6 @@ class VerifyProcessing(threading.Thread):
                     except queue.Empty:
                         time.sleep(0.05)
 
-                    # Check if the PoS node is still in the verify committee
-#                    stillin = False
-#                    for every in glovar.ComList:
-#                        if comid == every[1] and every[0] == incomno:
-#                            stillin = True
-#                    if not stillin:
-#                        logcontent = 'stillin:' + str(stillin)
-#                        self.logger.info(logcontent)
                     if glovar.ComChange:
                         each[6] = 0
                         break
@@ -270,10 +262,6 @@ class VerifyProcessing(threading.Thread):
                 time.sleep(0.2)
 
             # Check if the PoS node is still in the verify committee
-            # stillin = False
-            # for each in glovar.ComList:
-            #    if self.cominfo[0] == each[0] and self.cominfo[1] == each[1]:
-            #        stillin = True
             if glovar.ComChange:
                 each[6] = 0
                 break

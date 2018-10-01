@@ -153,6 +153,12 @@ class msghandle(threading.Thread):
                         each[4].put(data)
                         each[5].release()
 
+            # This node has send a transaction waiting for confirmation
+            if len(glovar.TransactionList):
+                glovar.FirstQueue.put(data)
+#                logcontent = "Check the firstblock for confirmation:" + str(data['content']['block'][4])
+#                self.logger.info(logcontent)
+
         else:
             logcontent = "Unkown data['type']:firsblock"
             self.logger.info(logcontent)
@@ -162,8 +168,8 @@ class msghandle(threading.Thread):
         broadMessage(data)
         # Receive a secondblock
         if data['No'] == 1:
-            logcontent = 'Receive a secondblock:' + str(data['messageid'])
-            self.logger.info(logcontent)
+#            logcontent = 'Receive a secondblock:' + str(data['messageid'])
+#            self.logger.info(logcontent)
 
             # This node is selected in at least one committees
             if len(glovar.ComList):
@@ -177,9 +183,9 @@ class msghandle(threading.Thread):
 
         # Receive a secondblock commition 
         elif data['No'] == 2:
-            logcontent = 'Receive a second commitment:' + \
-            str(data['content']['blockhash'])
-            self.logger.info(logcontent)
+#            logcontent = 'Receive a second commitment:' + \
+#            str(data['content']['blockhash'])
+#            self.logger.info(logcontent)
 
             # This node is selected in at least one committees
             if len(glovar.ComList):
@@ -191,9 +197,9 @@ class msghandle(threading.Thread):
 
         # Receive a commit secondblock
         elif data['No'] == 3:
-            logcontent = 'Receive a commit secondblock:' + \
-            str(data['content']['block'][1])
-            self.logger.info(logcontent)
+#            logcontent = 'Receive a commit secondblock:' + \
+#            str(data['content']['block'][1])
+#            self.logger.info(logcontent)
 
             # This node is selected in any committee
             if len(glovar.ComList):
@@ -208,12 +214,12 @@ class msghandle(threading.Thread):
                 if len(glovar.BLOCKCHAIN):
                     if glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)-1][1] != data['content']['block'][1]:
                         glovar.BLOCKCHAIN.append(data['content']['block'])
-                        logcontent = 'Add a secondblock to the chain'
-                        self.logger.info(logcontent)
+#                        logcontent = 'Add a secondblock to the chain'
+#                        self.logger.info(logcontent)
                 else:
                     glovar.BLOCKCHAIN.append(data['content']['block'])
-                    logcontent = 'Add a secondblock to the chain'
-                    self.logger.info(logcontent)
+#                    logcontent = 'Add a secondblock to the chain'
+#                    self.logger.info(logcontent)
                 glovar.blockchainLock.release()
 
         else:

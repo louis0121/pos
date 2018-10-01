@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import time, threading, logging, hashlib
+import time, threading, logging, hashlib, queue
 
 import glovar
 
@@ -13,6 +13,7 @@ class DelayMeasure(threading.Thread):
     def __init__(self, logdirectory):
         threading.Thread.__init__(self)
         self.logdirectory = logdirectory
+        self.firstconfirm = 0
 
     def run(self):
         # Config the directory of log file
@@ -25,17 +26,20 @@ class DelayMeasure(threading.Thread):
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
         self.logger.info('Start delay measurement process')
-        tpsrecordname = self.logdirectory + '/delayrecord.txt'
+        firstdelayname = self.logdirectory + '/firstdelay.txt'
+        seconddelayname = self.logdirectory + '/seconddelay.txt'
 
         time.sleep(INIWAIT_TIME + 2*RANBROAD_TIME + 10)
 
         testtime = 10
 
-        for i in range(10):
+        # for i in range(10):
+        while True:
+            self.firstconfirm = 0
             trans_input_no = 1
             trans_input_item = ['123']
             trans_input = [trans_input_no, trans_input_item]
-            
+
             trans_output_no = 1
             trans_output_output1 = ['456', 1]
             trans_output_item = [trans_output_output1]
@@ -43,28 +47,32 @@ class DelayMeasure(threading.Thread):
 
             timestamp = time.time()
             temptransaction = [trans_input, trans_output, timestamp]
-            
+
             temp = str(temptransaction)
             hashvalue = hashlib.sha256(temp.encode('utf-8')).hexdigest()
             newtransaction = [hashvalue, trans_input, trans_output, timestamp]
-            
+
+            glovar.TransactionList.append(newtransaction)
             senddata = {'messageid':hashvalue,'type':'transaction','No':1,'content':newtransaction}
             glovar.messageLock.acquire()
             glovar.MessageList.append(hashvalue)
             glovar.messageLock.release()
             start_length = len(glovar.BLOCKCHAIN)
+            start_time = time.time()
+            # Start the firstblock confirmation process
+            firstthread = threading.Thread(target=self.__firstCheck, args=(start_time, hashvalue, firstdelayname))
+            firstthread.start()
             broadMessage(senddata)
-            
-            start_time = int(time.time())
-            end_time = start_time
-            
+
+            end_time = start_time - 1
+
             notfind = True
             while notfind:
                 if len(glovar.BLOCKCHAIN) > start_length:
                     block = glovar.BLOCKCHAIN[start_length]
                     for each in block[7]:
                         if hashvalue == each[0]:
-                            end_time = int(time.time())
+                            end_time = time.time()
                             notfind = False
                             break
                     start_length += 1
@@ -72,43 +80,50 @@ class DelayMeasure(threading.Thread):
                     time.sleep(0.05)
 
             latency = end_time - start_time
-            logcontent = "Transaction:" + str(hashvalue) + " latency:" + str(latency)
+            logcontent = "Transaction:" + str(hashvalue) + " final latency:" + str(latency)
             self.logger.info(logcontent)
 
+            ftps = open(seconddelayname, 'a')
+            output = str(latency) + "\n"
+            ftps.write(output)
+            ftps.close()
 
-#        while True:
-#            date_stamp = int(time.time())
-#            if date_stamp > prev_time:
-#                end_length = len(glovar.BLOCKCHAIN)
-#                logcontent = "Start time: " + str(start_time) + " End time: " \
-#                + str(date_stamp) + " start length: " + str(start_length) + \
-#                " end length:" + str(end_length)
-#                self.logger.info(logcontent)
-#
-#                blocklist = glovar.BLOCKCHAIN[start_length:(end_length)]
-#                firstblocknum = 0
-#                for each in blocklist:
-#                    firstblocknum += len(each[6])
-#                    logcontent = "This block cotains:" + str(len(each[6])) + \
-#                            " first blocks\n" + str(each)
-#                    self.logger.info(logcontent)
-#
-#                transactionsum = 4200 * firstblocknum
-#                tps = transactionsum / (date_stamp - start_time)
-#
-#                ftps = open(tpsrecordname, 'a')
-#                output = str(tps) + "\n"
-#                ftps.write(output)
-#                ftps.close()
-#
-#                self.logger.info('-----------------------------------')
-#                logcontent = "Firstblock total:" + str(firstblocknum) + " tps: " + str(tps)
-#                self.logger.info(logcontent)
-#
-#                prev_time += MEASURE_INTERVAL
-#                start_time = int(time.time())
-#                start_length = len(glovar.BLOCKCHAIN)
-#
-#            else:
-#                    time.sleep(0.5)
+            while not self.firstconfirm:
+                time.sleep(0.1)
 
+        self.logger.info("Transaction delay measurement is over")
+
+    # Check the firstblock confirmation process
+    def __firstCheck(self, start_time, hashvalue, firstdelayname):
+
+        notfind = True
+        while notfind:
+            try:
+                data = glovar.FirstQueue.get_nowait()
+#                logcontent = 'VerifyProcessing get a message:' + str(data)
+#                self.logger.info(logcontent)
+                translist = data['content']['block'][5]
+                for each in translist:
+                    if hashvalue == each[0]:
+                        end_time = time.time()
+                        notfind = False
+                        break
+
+            except queue.Empty:
+                time.sleep(0.05)
+
+        firstlatency = end_time - start_time
+        logcontent = "Transaction:" + str(hashvalue) + " first latency:" + str(firstlatency)
+        self.logger.info(logcontent)
+        self.firstconfirm = 1
+
+        ftps = open(firstdelayname, 'a')
+        output = str(firstlatency) + "\n"
+        ftps.write(output)
+        ftps.close()
+
+        for each in glovar.TransactionList:
+            if hashvalue == each[0]:
+                transconfirm = each.copy()
+                break
+        glovar.TransactionList.remove(transconfirm)

@@ -79,9 +79,9 @@ class BlockProcessing(threading.Thread):
             glovar.messageLock.release()
             broadMessage(senddata)
 
-            self.logger.info('---------------------------------')
-            logcontent = str(incomno) + ' :broadcast a block:' + str(hashvalue)
-            self.logger.info(logcontent)
+#            self.logger.info('---------------------------------')
+#            logcontent = str(incomno) + ' :broadcast a block:' + str(hashvalue)
+#            self.logger.info(logcontent)
 
             # Change the corresponding global status
             for each in glovar.ComList:
@@ -132,8 +132,8 @@ class BlockProcessing(threading.Thread):
     # Handle message for the generation committee
     def dataHandle(self, data):
         if data['type'] == 'transaction':
-            logcontent = "Handle a transaction:" + str(data['messageid'])
-            self.logger.info(logcontent)
+#            logcontent = "Handle a transaction:" + str(data['messageid'])
+#            self.logger.info(logcontent)
 
             for each in glovar.ComList:
                 if self.cominfo[1] == each[1]:
@@ -148,8 +148,8 @@ class BlockProcessing(threading.Thread):
 
                 # Verify if the node is in our committee
                 if blockdata[1] in self.cominfo[2]:
-                    logcontent = 'Verify a firstblock:' + str(blockdata[4]) + ' from comid:' + str(blockdata[1]) + ' in committee:' +str(self.cominfo[0])
-                    self.logger.info(logcontent)
+#                    logcontent = 'Verify a firstblock:' + str(blockdata[4]) + ' from comid:' + str(blockdata[1]) + ' in committee:' +str(self.cominfo[0])
+#                    self.logger.info(logcontent)
 
                     # Change the corresponding global status
                     for each in glovar.ComList:
@@ -169,8 +169,8 @@ class BlockProcessing(threading.Thread):
                     glovar.MessageList.append(hashvalue)
                     glovar.messageLock.release()
                     broadMessage(senddata)
-                    logcontent = 'Send a commitment for block:' + str(senddata['content']['blockhash'])
-                    self.logger.info(logcontent)
+#                    logcontent = 'Send a commitment for block:' + str(senddata['content']['blockhash'])
+#                    self.logger.info(logcontent)
 
                     # Check if there is another PoS in the same committee
                     for each in glovar.ComList:
@@ -195,13 +195,13 @@ class BlockProcessing(threading.Thread):
                             each[3]['commit'] += 1
                             each[3]['commitlist'].append(data['content']['comid'])
                             glovar.ComlistLock.release()
-                            logcontent = 'Block:' + str(each[3]['blockhash']) + ' receive a commit. Total:' + str(each[3]['commit'])
-                            self.logger.info(logcontent)
+#                            logcontent = 'Block:' + str(each[3]['blockhash']) + ' receive a commit. Total:' + str(each[3]['commit'])
+#                            self.logger.info(logcontent)
 
                             # Receive enough commitment
                             if (each[3]['commit'] >= glovar.Firstcommem//2+1):
-                                logcontent = 'Receive enough commitment for blocblock:' + str(each[3]['blockhash'])
-                                self.logger.info(logcontent)
+#                                logcontent = 'Receive enough commitment for blocblock:' + str(each[3]['blockhash'])
+#                                self.logger.info(logcontent)
                                 self.broadFirstCommitBlock()
                                 self.addBlock(each[3]['newblock'][0])
 
@@ -219,8 +219,8 @@ class BlockProcessing(threading.Thread):
                         listisin = False
                         break
                 if listisin:
-                    logcontent = 'Verified the commit firstblock:' + str(data['content']['block'][4])
-                    self.logger.info(logcontent)
+#                    logcontent = 'Verified the commit firstblock:' + str(data['content']['block'][4])
+#                    self.logger.info(logcontent)
 
                     for each in glovar.ComList:
                         if each[1] == self.cominfo[1]:
@@ -240,7 +240,7 @@ class BlockProcessing(threading.Thread):
         # Receive a commit secondblock 
         elif data['type'] == 'secondblock' and data['No'] == 3:
             logcontent = 'Handle a commit secondblock:'
-            self.logger.info(logcontent)
+#            self.logger.info(logcontent)
 
         else:
             logcontent = 'Handle an unkown data'
@@ -277,9 +277,9 @@ class BlockProcessing(threading.Thread):
         glovar.MessageList.append(hashvalue)
         glovar.messageLock.release()
         broadMessage(senddata)
-        logcontent = 'Broad a commit firstblock:' + \
-        str(senddata['content']['block'][4])
-        self.logger.info(logcontent)
+#        logcontent = 'Broad a commit firstblock:' + \
+#        str(senddata['content']['block'][4])
+#        self.logger.info(logcontent)
 
     # Add the block to the chain
     def addBlock(self, block):
@@ -287,12 +287,12 @@ class BlockProcessing(threading.Thread):
         if len(glovar.FIRSTBLOCKCHAIN):
             if glovar.FIRSTBLOCKCHAIN[len(glovar.FIRSTBLOCKCHAIN)-1][4] != block[4]:
                 glovar.FIRSTBLOCKCHAIN.append(block)
-                logcontent = 'Add a firstblock to the chain'
-                self.logger.info(logcontent)
+#                logcontent = 'Add a firstblock to the chain'
+#                self.logger.info(logcontent)
         else:
             glovar.FIRSTBLOCKCHAIN.append(block)
-            logcontent = 'Add a firstblock to the chain'
-            self.logger.info(logcontent)
+#            logcontent = 'Add a firstblock to the chain'
+#            self.logger.info(logcontent)
         glovar.firstchainLock.release()
 
         # Change the status of committee member
@@ -310,9 +310,9 @@ class BlockProcessing(threading.Thread):
                 each[3]['newblock'].clear()
                 each[5].release()
 
-        self.logger.info('----------------------------------------------')
-        logcontent = 'Choose a new leader to Generate a block'
-        self.logger.info(logcontent)
+#        self.logger.info('----------------------------------------------')
+#        logcontent = 'Choose a new leader to Generate a block'
+#        self.logger.info(logcontent)
 
         incomno = self.cominfo[0]
         comid = self.cominfo[1]
@@ -321,8 +321,8 @@ class BlockProcessing(threading.Thread):
         randomstring = "".join(str(self.cominfo[2])) + str(block[1]) + str(block[4])
         idchoose = int(hashlib.sha256(randomstring.encode('utf-8')).hexdigest(), 16) % len(commember)
 
-        logcontent = 'The ' + str(idchoose+1) + ' member: ' + str(commember[idchoose]) + ' is chosen to generate a block'
-        self.logger.info(logcontent)
+#        logcontent = 'The ' + str(idchoose+1) + ' member: ' + str(commember[idchoose]) + ' is chosen to generate a block'
+#        self.logger.info(logcontent)
 
         # Self is selected
         transactions = []
@@ -365,9 +365,9 @@ class BlockProcessing(threading.Thread):
             glovar.messageLock.release()
             broadMessage(senddata)
 
-            self.logger.info('---------------------------------')
-            logcontent = str(incomno) + ' :broadcast a block:' + str(hashvalue)
-            self.logger.info(logcontent)
+#            self.logger.info('---------------------------------')
+#            logcontent = str(incomno) + ' :broadcast a block:' + str(hashvalue)
+#            self.logger.info(logcontent)
 
             # Change the corresponding global status
             for each in glovar.ComList:
