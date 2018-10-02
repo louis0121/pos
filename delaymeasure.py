@@ -79,20 +79,20 @@ class DelayMeasure(threading.Thread):
                     start_length += 1
                     if notfind:
                         if int(cur_time) - int(start_time) > 60:
-                            broadMessage(senddata)
-                            start_time = time.time()
+                            break
 
                 else:
                     time.sleep(0.05)
 
-            latency = end_time - start_time
-            logcontent = "Transaction:" + str(hashvalue) + " final latency:" + str(latency)
-            self.logger.info(logcontent)
+            if not notfind:
+                latency = end_time - start_time
+                logcontent = "Transaction:" + str(hashvalue) + " final latency:" + str(latency)
+                self.logger.info(logcontent)
 
-            ftps = open(seconddelayname, 'a')
-            output = str(latency) + "\n"
-            ftps.write(output)
-            ftps.close()
+                ftps = open(seconddelayname, 'a')
+                output = str(latency) + "\n"
+                ftps.write(output)
+                ftps.close()
 
             firstthread.join()
 #            while not self.firstconfirm:
@@ -105,7 +105,7 @@ class DelayMeasure(threading.Thread):
 
         notfind = True
         while notfind:
-#            try:
+            cur_time = time.time()
             data = glovar.FirstQueue.get()
 #            logcontent = 'Check a firstblock:' + str(data['content']['block'][4])
 #            self.logger.info(logcontent)
@@ -116,21 +116,24 @@ class DelayMeasure(threading.Thread):
                     notfind = False
                     break
 
+            if notfind:
+                if cur_time - start_time > 60:
+                    break
+
 #            except queue.Empty:
 #                time.sleep(0.05)
 
-        firstlatency = end_time - start_time
-        logcontent = "Transaction:" + str(hashvalue) + " first latency:" + str(firstlatency)
-        self.logger.info(logcontent)
-        self.firstconfirm = 1
+        if not notfind:
+            firstlatency = end_time - start_time
+            logcontent = "Transaction:" + str(hashvalue) + " first latency:" + str(firstlatency)
+            self.logger.info(logcontent)
+            self.firstconfirm = 1
 
-        ftps = open(firstdelayname, 'a')
-        output = str(firstlatency) + "\n"
-        ftps.write(output)
-        ftps.close()
+            ftps = open(firstdelayname, 'a')
+            output = str(firstlatency) + "\n"
+            ftps.write(output)
+            ftps.close()
 
-        for each in glovar.TransactionList:
-            if hashvalue == each[0]:
-                transconfirm = each.copy()
-                break
-        glovar.TransactionList.remove(transconfirm)
+        glovar.TransLock.acquire()
+        glovar.TransactionList.clear()
+        glovar.TransLock.release()

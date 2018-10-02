@@ -40,6 +40,7 @@ ComList = []
 ComlistLock = threading.Lock()
 ComChange = 0
 TransactionList = []
+TransLock = threading.Lock()
 FirstQueue = queue.Queue()
 
 # State of blockchain 
