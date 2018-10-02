@@ -14,7 +14,7 @@ class BlockProcessing(threading.Thread):
         self.logdirectory = logdirectory
 
     def run(self):
-        filename = self.logdirectory + 'PoSnodelog.txt'
+        filename = self.logdirectory + 'Blockgenlog.txt'
         self.logger = logging.getLogger(str(self.cominfo[1]))
         self.logger.setLevel(level = logging.INFO)
         handler = logging.FileHandler(filename)
@@ -131,7 +131,7 @@ class BlockProcessing(threading.Thread):
                 if self.cominfo[1] == each[1]:
                     each[3]['transactionlist'].append(data['content'])
 
-        if data['type'] == 'firstblock':
+        elif data['type'] == 'firstblock':
             # Verify whether it is commited by the committee member
             if data['No'] == 1:
 #            logcontent = 'Handle a firstblock:' + str(data['messageid'])
@@ -217,11 +217,13 @@ class BlockProcessing(threading.Thread):
                     for each in glovar.ComList:
                         if each[1] == self.cominfo[1]:
                             if len(each[3]['transactionlist']):
+                                each[5].acquire()
                                 temptransactions = []
                                 for every in each[3]['transactionlist']:
                                     if every not in data['content']['block'][5]:
                                         temptransactions.append(every)
                                 each[3]['transactionlist'] = temptransactions.copy()
+                                each[5].release()
 
                             self.addBlock(data['content']['block'])
 
@@ -232,10 +234,33 @@ class BlockProcessing(threading.Thread):
         # Receive a commit secondblock 
         elif data['type'] == 'secondblock' and data['No'] == 3:
             logcontent = 'Handle a commit secondblock:'
-#            self.logger.info(logcontent)
+            self.logger.info(logcontent)
+
+            for each in glovar.ComList:
+                if each[1] == self.cominfo[1]:
+                    if len(each[3]['transactionlist']):
+                        each[5].acquire()
+                        temptransactions = []
+                        for every in each[3]['transactionlist']:
+                            if every not in data['content']['block'][7]:
+                                temptransactions.append(every)
+                        each[3]['transactionlist'] = temptransactions.copy()
+                        each[5].release()
+
+            glovar.blockchainLock.acquire()
+            if len(glovar.BLOCKCHAIN):
+                if glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)-1][1] != data['content']['block'][1]:
+                    glovar.BLOCKCHAIN.append(data['content']['block'])
+                    logcontent = 'Add a secondblock to the chain'
+                    self.logger.info(logcontent)
+            else:
+                glovar.BLOCKCHAIN.append(data['content']['block'])
+                logcontent = 'Add a secondblock to the chain'
+                self.logger.info(logcontent)
+            glovar.blockchainLock.release()
 
         else:
-            logcontent = 'Handle an unkown data'
+            logcontent = 'Handle an unkown data:' + str(data)
             self.logger.info(logcontent)
 
     # Send the commit firstblock to last committee

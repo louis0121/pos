@@ -48,6 +48,7 @@ class VerifyProcessing(threading.Thread):
                         time.sleep(0.05)
 
                     if glovar.ComChange:
+                        generatethread.join()
                         each[6] = 0
                         break
 
@@ -185,10 +186,10 @@ class VerifyProcessing(threading.Thread):
 
     def __gendatablock(self):
 
-        stillin = True
+#        stillin = True
         cur_time = int(time.time())
         prev_time = cur_time - ( cur_time % BLOCK_INTERVAL ) + BLOCK_INTERVAL
-        while stillin:
+        while True:
             cur_time = int(time.time())
             if cur_time > prev_time:
                 # Select a leader to generate block 
@@ -262,10 +263,10 @@ class VerifyProcessing(threading.Thread):
 
             # Check if the PoS node is still in the verify committee
             if glovar.ComChange:
-                for each in glovar.ComList:
-                    if self.cominfo[1] == each[1]:
-                        each[6] = 0
-                        break
+#                for each in glovar.ComList:
+#                    if self.cominfo[1] == each[1]:
+#                        each[6] = 0
+#                        break
                 break
 
         logcontent = "The secondblock generation pocess is ended"

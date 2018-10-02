@@ -18,7 +18,7 @@ class RanselectProcessing(threading.Thread):
 
     def run(self):
         # Config the directory of log file
-        filename = self.logdirectory + 'PoSnodelog.txt'
+        filename = self.logdirectory + 'Ranselectlog.txt'
         self.logger = logging.getLogger('RanselectProcessing')
         self.logger.setLevel(level = logging.INFO)
         handler = logging.FileHandler(filename)
@@ -70,6 +70,20 @@ class RanselectProcessing(threading.Thread):
                 break
             else:
                 time.sleep(0.5)
+        # Inform other PoS node process to stop
+        glovar.ComChange = 1
+        notend = True
+        while notend:
+            notend = False
+            for each in glovar.ComList:
+                if each[6]:
+                    notend = True
+                    break
+
+            time.sleep(0.05)
+
+        glovar.ComList.clear()
+        glovar.ComChange = 0
 
         self.logger.info('--------------------------------------------------')
         # Start committee formation
@@ -154,19 +168,19 @@ class RanselectProcessing(threading.Thread):
 #        self.logger.info(logcontent)
 
         # Inform other PoS node process to stop
-        glovar.ComChange = 1
-        notend = True
-        while notend:
-            notend = False
-            for each in glovar.ComList:
-                if each[6]:
-                    notend = True
-                    break
-
-            time.sleep(0.05)
-
-        glovar.ComList.clear()
-        glovar.ComChange = 0
+#        glovar.ComChange = 1
+#        notend = True
+#        while notend:
+#            notend = False
+#            for each in glovar.ComList:
+#                if each[6]:
+#                    notend = True
+#                    break
+#
+#            time.sleep(0.05)
+#
+#        glovar.ComList.clear()
+#        glovar.ComChange = 0
 
         # Record the status of committee
         for i in range (nodenum):

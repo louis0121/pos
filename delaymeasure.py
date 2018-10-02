@@ -68,6 +68,7 @@ class DelayMeasure(threading.Thread):
 
             notfind = True
             while notfind:
+                cur_time = time.time()
                 if len(glovar.BLOCKCHAIN) > start_length:
                     block = glovar.BLOCKCHAIN[start_length]
                     for each in block[7]:
@@ -76,6 +77,11 @@ class DelayMeasure(threading.Thread):
                             notfind = False
                             break
                     start_length += 1
+                    if notfind:
+                        if int(cur_time) - int(start_time) > 60:
+                            broadMessage(senddata)
+                            start_time = time.time()
+
                 else:
                     time.sleep(0.05)
 
@@ -88,8 +94,9 @@ class DelayMeasure(threading.Thread):
             ftps.write(output)
             ftps.close()
 
-            while not self.firstconfirm:
-                time.sleep(0.1)
+            firstthread.join()
+#            while not self.firstconfirm:
+#                time.sleep(0.1)
 
         self.logger.info("Transaction delay measurement is over")
 

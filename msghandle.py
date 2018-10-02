@@ -53,8 +53,8 @@ class msghandle(threading.Thread):
                     self.__secondblock_handle(data)
 
                 # Receive a newcommitte generation message
-                elif data['type'] == 'newcommittee':
-                    self.__newcommittee_handle(data)
+#                elif data['type'] == 'newcommittee':
+#                    self.__newcommittee_handle(data)
 
                 # Receive a transaction 
                 elif data['type'] == 'transaction':
@@ -91,11 +91,12 @@ class msghandle(threading.Thread):
             glovar.HashList.append(data['content']['ranhash'])
             glovar.hashLock.release()
 
+            broadMessage(data)
+
             if ( glovar.HashSeed == 0 or data['content']['ranhash'] < glovar.HashSeed ):
                 glovar.hashLock.acquire()
                 glovar.HashSeed = data['content']['ranhash']
                 glovar.hashLock.release()
-                broadMessage(data)
 
 #                    logcontent = 'Broad this hashvalue again: ' + str(data['ranhash'])
 #                    self.logger.info(logcontent)
@@ -204,10 +205,10 @@ class msghandle(threading.Thread):
             # This node is selected in any committee
             if len(glovar.ComList):
                 for each in glovar.ComList:
-                    if each[0] == glovar.Firstcomno + 1:
-                        each[5].acquire()
-                        each[4].put(data)
-                        each[5].release()
+#                    if each[0] == glovar.Firstcomno + 1:
+                    each[5].acquire()
+                    each[4].put(data)
+                    each[5].release()
 #                        logcontent = 'transmit a commit firstblock to generation committee'
 #                        self.logger.info(logcontent)
             else:
