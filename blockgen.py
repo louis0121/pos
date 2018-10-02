@@ -73,7 +73,7 @@ class BlockProcessing(threading.Thread):
 
             senddata = {'messageid':hashvalue,'type':'firstblock','No':1,'content':json_block}
             # Wait for other Pos node to start up receive process
-            time.sleep(3)
+            time.sleep(5)
             glovar.messageLock.acquire()
             glovar.MessageList.append(hashvalue)
             glovar.messageLock.release()

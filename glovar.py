@@ -42,6 +42,15 @@ ComChange = 0
 TransactionList = []
 FirstQueue = queue.Queue()
 
+# State of blockchain 
+FIRSTBLOCKCHAIN = []
+firstchainLock = threading.Lock()
+BLOCKCHAIN = []
+blockchainLock = threading.Lock()
+
+####################################
+
+# Not used
 NewComList = []
 newComLock = threading.Lock()
 NewRanList = []
@@ -53,37 +62,13 @@ NewPosList = []
 newcomqueue = queue.Queue()
 newComqueueLock = threading.Lock()
 
-# State of blockchain 
-FIRSTBLOCKCHAIN = []
-firstchainLock = threading.Lock()
-BLOCKCHAIN = []
-blockchainLock = threading.Lock()
 
-####################################
+#threadLock = threading.Lock()
 
-threadLock = threading.Lock()
-
-blockqueue = queue.Queue()
-
-BINDED_ADDR = ()
-
-IDENTITY_LIST = []
-IDKEYCHAIN = []
-IDENTITY_POOL = []
-HASHID_POOL = []
-IDPREPARECHAIN = []
 
 # State of blockchain and mining parameters
-MINING_TARGET = int('000122d3f4210c9fb88d8da10a2f86d08d28700c2770a7481ac4fab072f31458', 16)
-PREV_BLOCKHASH = 0
-MINEDBLOCK_HEIGHT = 1
+#MINING_TARGET = int('000122d3f4210c9fb88d8da10a2f86d08d28700c2770a7481ac4fab072f31458', 16)
+#PREV_BLOCKHASH = 0
+#MINEDBLOCK_HEIGHT = 1
 
-# Receive a new idblock before generate itself, store the old state to generate the same height
-Generating_height = 1
-Pool_isbackup = False
-BACKMINING_TARGET = int('000122d3f4210c9fb88d8da10a2f86d08d28700c2770a7481ac4fab072f31458', 16)
-BACKPREV_BLOCKHASH = 0
-BACKMINEDBLOCK_HEIGHT = 1
-BACK_POOL = []
-BACKKEY_POOL = []
 

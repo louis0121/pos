@@ -88,6 +88,9 @@ class VerifyProcessing(threading.Thread):
                 for each in glovar.ComList:
                     if self.cominfo[1] == each[1]:
                         each[5].acquire()
+                        if len(each[3]['newsecondblock']):
+                            each[3]['newsecondblock'].clear()
+
                         each[3]['newsecondblock'].append(blockdata)
                         each[5].release()
 
@@ -124,10 +127,14 @@ class VerifyProcessing(threading.Thread):
             for each in glovar.ComList:
                 if each[1] == self.cominfo[1]:
                     if each[3]['verify']:
-                        each[5].acquire()
-                        each[3]['secondcommit'] += 1
-                        each[3]['secondcommitlist'].append(data['content']['comid'])
-                        each[5].release()
+                        
+                        if each[3]['newsecondblock'][0][1] == data['content']['blockhash']:
+                            
+                            each[5].acquire()
+                            each[3]['secondcommit'] += 1
+                            each[3]['secondcommitlist'].append(data['content']['comid'])
+                            each[5].release()
+
 #                        logcontent = 'Secondblock:' + str(each[3]['secondblockhash']) + ' receive a commit. Total:' + str(each[3]['secondcommit'])
 #                        self.logger.info(logcontent)
 
@@ -187,6 +194,7 @@ class VerifyProcessing(threading.Thread):
     def __gendatablock(self):
 
 #        stillin = True
+        time.sleep(5)
         cur_time = int(time.time())
         prev_time = cur_time - ( cur_time % BLOCK_INTERVAL ) + BLOCK_INTERVAL
         while True:

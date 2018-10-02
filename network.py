@@ -95,7 +95,6 @@ class TcpServer(threading.Thread):
         # If the default tcp port is already in use, port puls 1 until one tcp port has been binded
         try:
             server_socket.bind((self.tcpaddr, self.tcpport))
-            # glovar.BINDED_ADDR = glovar.BINDED_ADDR + (self.tcpaddr, self.tcpport)
             logcontent = 'Bind local port: (' + str(self.tcpaddr) + ',' + str(self.tcpport) + ')'
             self.logger.info(logcontent)
         except OSError as err:
