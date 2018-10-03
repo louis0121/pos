@@ -79,6 +79,9 @@ class DelayMeasure(threading.Thread):
                     start_length += 1
                     if notfind:
                         if int(cur_time) - int(start_time) > 60:
+                            logcontent = "Transction:" + str(hashvalue) + \
+                                " second comfirmation has surpassed 60 seconds."
+                            self.logger.info(logcontent)
                             break
 
                 else:
@@ -95,6 +98,7 @@ class DelayMeasure(threading.Thread):
                 ftps.close()
 
             firstthread.join()
+            self.logger.info("The second confirmation is finishied")
 #            while not self.firstconfirm:
 #                time.sleep(0.1)
 
@@ -118,6 +122,9 @@ class DelayMeasure(threading.Thread):
 
             if notfind:
                 if cur_time - start_time > 60:
+                    logcontent = "Transction:" + str(hashvalue) + \
+                        " first comfirmation has surpassed 60 seconds."
+                    self.logger.info(logcontent)
                     break
 
 #            except queue.Empty:
@@ -137,3 +144,5 @@ class DelayMeasure(threading.Thread):
         glovar.TransLock.acquire()
         glovar.TransactionList.clear()
         glovar.TransLock.release()
+
+        self.logger.info("The first confirmaiton is finished")

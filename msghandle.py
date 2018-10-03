@@ -26,7 +26,6 @@ class msghandle(threading.Thread):
 
         while True:
             message = glovar.msgqueue.get()
-            #self.logger.info('Get a message from msgqueue.')
             self.connectednode = message[0]
             msgdata = message[1]
             self.addr = message[2]

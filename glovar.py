@@ -16,6 +16,7 @@ broadLock = threading.Lock() # Broad message queue lock
 broadqueue = queue.Queue()
 
 # Message handle status
+msgLock = threading.Lock()
 msgqueue = queue.Queue() # From network to message handle
 messageLock = threading.Lock()
 MessageList = [] # Record message id that has been received
