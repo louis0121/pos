@@ -70,7 +70,7 @@ def main():
 
     # Start protocol process
     time.sleep(3)
-    user_comselection = RanselectProcessing(logdirectory)
+    user_comselection = Comselect(logdirectory)
     user_comselection.start()
 #    new_comgeneration = CommitteeGeneration(logdirectory)
 #    new_comgeneration.start()

@@ -70,9 +70,9 @@ class msghandle(threading.Thread):
     def __comrandom_handle(self, data):
         # Receive a random number
         if data['No'] == 1:
-#            logcontent = 'Handle a random number:' + str(data['content']['genrandom'])
-#            self.logger.info(logcontent)
-#            if str(data['content']['genrandom']) not in glovar.RanList:
+            logcontent = 'Handle a random number:' + str(data['content']['genrandom'])
+            self.logger.info(logcontent)
+
             glovar.ranLock.acquire()
             glovar.RanList.append(str(data['content']['genrandom']))
             glovar.ranLock.release()
@@ -83,10 +83,9 @@ class msghandle(threading.Thread):
 #                self.logger.info(logcontent)
         # Receive a hashseed
         elif data['No'] == 2:
-#            logcontent = ' Receive a hashvalue:' + str(data['content']['ranhash'])
-#            self.logger.info(logcontent)
+            logcontent = ' Receive a hashvalue:' + str(data['content']['ranhash'])
+            self.logger.info(logcontent)
 
-#            if data['ranhash'] not in glovar.HashList:
             glovar.hashLock.acquire()
             glovar.HashList.append(data['content']['ranhash'])
             glovar.hashLock.release()

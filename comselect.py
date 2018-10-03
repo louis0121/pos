@@ -11,14 +11,14 @@ from verify import *
 from network import broadMessage
 
 # committee process               
-class RanselectProcessing(threading.Thread):
+class Comselect(threading.Thread):
     def __init__(self, logdirectory):
         threading.Thread.__init__(self)
         self.logdirectory = logdirectory
 
     def run(self):
         # Config the directory of log file
-        filename = self.logdirectory + 'Ranselectlog.txt'
+        filename = self.logdirectory + 'Comselectlog.txt'
         self.logger = logging.getLogger('RanselectProcessing')
         self.logger.setLevel(level = logging.INFO)
         handler = logging.FileHandler(filename)

@@ -36,10 +36,6 @@ class TpsMeasure(threading.Thread):
             date_stamp = time.time()
             if date_stamp > prev_time:
                 end_length = len(glovar.BLOCKCHAIN)
-                logcontent = "Start time: " + str(start_time) + " End time: " \
-                + str(date_stamp) + " start length: " + str(start_length) + \
-                " end length:" + str(end_length)
-                self.logger.info(logcontent)
 
                 blocklist = glovar.BLOCKCHAIN[start_length:(end_length)]
                 firstblocknum = 0
@@ -57,8 +53,13 @@ class TpsMeasure(threading.Thread):
                 ftps.write(output)
                 ftps.close()
 
-                self.logger.info('-----------------------------------')
-                logcontent = "Firstblock total:" + str(firstblocknum) + " tps: " + str(tps)
+                begintime = time.strftime("%H:%M:%S", time.localtime(start_time))
+                stoptime = time.strftime("%H:%M:%S", time.localtime(date_stamp))
+                logcontent = "-------------------------------------\n" + \
+                        "Start time: " + begintime + " End time: " + \
+                        stoptime + " start length: " + str(start_length) + \
+                " end length:" + str(end_length) + "\n" + \
+                "Firstblock total:" + str(firstblocknum) + " tps: " + str(tps)
                 self.logger.info(logcontent)
 
                 prev_time += MEASURE_INTERVAL
