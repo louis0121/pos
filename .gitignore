@@ -2,3 +2,5 @@ log/
 __pycache__/
 *.png
 *.txt
+test.py
+plotfig.py
