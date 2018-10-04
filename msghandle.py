@@ -26,6 +26,8 @@ class msghandle(threading.Thread):
 
         while True:
             message = glovar.msgqueue.get()
+#            logcontent = "Messages in the queue:" + str(glovar.msgqueue.qsize())
+#            self.logger.info(logcontent)
             self.connectednode = message[0]
             msgdata = message[1]
             self.addr = message[2]
@@ -38,6 +40,9 @@ class msghandle(threading.Thread):
                 glovar.messageLock.acquire()
                 glovar.MessageList.append(data['messageid'])
                 glovar.messageLock.release()
+
+#                logcontent = "Message:" + str(data)
+#                self.logger.info(logcontent)
 
                 # Receive a committee formation message
                 if data['type'] == 'comrandom':
@@ -84,6 +89,11 @@ class msghandle(threading.Thread):
         elif data['No'] == 2:
             logcontent = ' Receive a hashvalue:' + str(data['content']['ranhash'])
             self.logger.info(logcontent)
+#            msgnum = glovar.msgqueue.qsize()
+#            if glovar.msgqueue.empty():
+#                self.logger.info("The msgqueue is empty")
+#            logcontent = "Number of messages in the msgqueue is:" + str(msgnum)
+#            self.logger.info(logcontent)
 
             glovar.hashLock.acquire()
             glovar.HashList.append(data['content']['ranhash'])
@@ -92,6 +102,9 @@ class msghandle(threading.Thread):
             broadMessage(data)
 
             if ( glovar.HashSeed == 0 or data['content']['ranhash'] < glovar.HashSeed ):
+                logcontent = "Replace HashSeed:\n" +str(glovar.HashSeed) + \
+                        "with hashvalue:\n" + str(data['content']['ranhash'])
+                self.logger.info(logcontent)
                 glovar.hashLock.acquire()
                 glovar.HashSeed = data['content']['ranhash']
                 glovar.hashLock.release()
