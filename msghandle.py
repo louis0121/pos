@@ -36,7 +36,8 @@ class msghandle(threading.Thread):
 #            self.logger.info(logcontent)
 
             # The first time to receive this message
-            if data['messageid'] not in glovar.MessageList:
+            if (data['messageid'] not in glovar.MessageList) and ((not glovar.ComChange) or \
+                        (glovar.ComChange and data['type'] == 'comrandom')) :
                 glovar.messageLock.acquire()
                 glovar.MessageList.append(data['messageid'])
                 glovar.messageLock.release()
