@@ -19,6 +19,7 @@ class ConnectedNode(threading.Thread):
         header = [PACKETVER, json_data.__len__()]
         headerPack = struct.pack('!2I', *header)
         packdata = headerPack + json_data.encode('utf-8')
+#        time.sleep(random.uniform(0,0.1))
         self.sock.send(packdata)
 
     def run(self):
@@ -180,7 +181,7 @@ class BroadMsg(threading.Thread):
     def __init__(self, logdirectory):
         threading.Thread.__init__(self)
         self.logdirectory = logdirectory
-                        
+
     def run(self):
         filename = self.logdirectory + 'networklog.txt'
         self.logger = logging.getLogger('BroadMsg')
@@ -198,8 +199,10 @@ class BroadMsg(threading.Thread):
                 #glovar.broadLock.release()
                 #self.logger.info('get a message from broadqueue.')
                 for each in  glovar.CONNECTION_LIST:
+                    sendthread = threading.Thread(target=self.latencyBroad, args=(each, sendmsg))
+                    sendthread.start()
 #                    time.sleep(random.uniform(0,0.1))
-                    each.senddata(sendmsg)
+#                    each.senddata(sendmsg)
 #                    logcontent = 'Send message: ' + str(sendmsg) + ' to ' + str(each.addr)
 #                    self.logger.info(logcontent)
             except Exception as e:
@@ -208,6 +211,11 @@ class BroadMsg(threading.Thread):
                 self.logger.info(sendmsg)
                 self.logger.info("------------------------")
                 raise e
+
+    def latencyBroad(self, each, sendmsg):
+#        time.sleep(random.uniform(0,0.01))
+        each.senddata(sendmsg)
+
 
 # Broad a message into the network
 def broadMessage(senddata):

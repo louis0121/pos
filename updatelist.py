@@ -25,7 +25,7 @@ class UpdateList(threading.Thread):
 
         # Wait one or two RANBROAD_TIME duration 
         time.sleep(INIWAIT_TIME + 2*RANBROAD_TIME + 10)
-        listnum = 1000
+        listnum = 3000
         interval = 20
 
         cur_time = int(time.time())

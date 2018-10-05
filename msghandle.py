@@ -103,7 +103,7 @@ class msghandle(threading.Thread):
 
             if ( glovar.HashSeed == 0 or data['content']['ranhash'] < glovar.HashSeed ):
                 logcontent = "Replace HashSeed:\n" +str(glovar.HashSeed) + \
-                        "with hashvalue:\n" + str(data['content']['ranhash'])
+                        " with hashvalue:\n" + str(data['content']['ranhash'])
                 self.logger.info(logcontent)
                 glovar.hashLock.acquire()
                 glovar.HashSeed = data['content']['ranhash']

@@ -138,9 +138,14 @@ class Comselect(threading.Thread):
 
         hashvalue = int(hashlib.sha256(randomstring.encode('utf-8')).hexdigest(), 16)
         glovar.hashLock.acquire()
-        glovar.HashSeed = hashvalue
         glovar.HashList.append(hashvalue)
+        if ( glovar.HashSeed == 0 or hashvalue < glovar.HashSeed ):
+            logcontent = "Replace HashSeed:\n" +str(glovar.HashSeed) + \
+                        " with hashvalue:\n" + str(hashvalue)
+            self.logger.info(logcontent)
+            glovar.HashSeed = hashvalue
         glovar.hashLock.release()
+
 
         content = {'ranhash':hashvalue,'ranlist':glovar.RanList}
         beforesend = {'type':'comrandom','No':2,'content':content}

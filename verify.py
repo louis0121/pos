@@ -67,10 +67,8 @@ class VerifyProcessing(threading.Thread):
                 for each in glovar.ComList:
                     if self.cominfo[1] == each[1]:
                         if data['content']['block'][4] not in each[3]['addfirstlist']:
-                            each[5].acquire()
                             each[3]['commitblocklist'].append(data['content']['block'][4])
                             each[3]['transactionlist'].extend(data['content']['block'][5])
-                            each[5].release()
 #                        logcontent = 'Save a commit firstblock:' + str(data['content']['block'][4])
 #                        self.logger.info(logcontent)
 
@@ -85,15 +83,15 @@ class VerifyProcessing(threading.Thread):
                 self.logger.info(logcontent)
 
                 # Change the corresponding global status
-                for each in glovar.ComList:
-                    if self.cominfo[1] == each[1]:
-                        each[5].acquire()
-                        if len(each[3]['newsecondblock']):
-                            each[3]['newsecondblock'].clear()
-
-                        each[3]['newsecondblock'].append(blockdata)
-                        each[5].release()
-
+#                for each in glovar.ComList:
+#                    if self.cominfo[1] == each[1]:
+#                        each[5].acquire()
+#                        if len(each[3]['newsecondblock']):
+#                            each[3]['newsecondblock'].clear()
+#
+#                        each[3]['newsecondblock'].append(blockdata)
+#                        each[5].release()
+#
                 # Send a commitment message
                 content = {'blockhash':blockdata[1],'incomno':self.cominfo[0],'comid':self.cominfo[1],'commit':1}
                 beforesend = {'type':'secondblock','No':2,'content':content}
@@ -124,26 +122,21 @@ class VerifyProcessing(threading.Thread):
                 logcontent = 'Verify a second commitment for block:' + str(data['content']['blockhash']) + ' from comid:' + str(data['content']['comid'])
                 self.logger.info(logcontent)
 
-            for each in glovar.ComList:
-                if each[1] == self.cominfo[1]:
-                    if each[3]['verify']:
-                        
-                        if each[3]['newsecondblock'][0][1] == data['content']['blockhash']:
-                            
-                            each[5].acquire()
-                            each[3]['secondcommit'] += 1
-                            each[3]['secondcommitlist'].append(data['content']['comid'])
-                            each[5].release()
-
-#                        logcontent = 'Secondblock:' + str(each[3]['secondblockhash']) + ' receive a commit. Total:' + str(each[3]['secondcommit'])
-#                        self.logger.info(logcontent)
+                for each in glovar.ComList:
+                    if each[1] == self.cominfo[1]:
+                        if each[3]['verify']:
+                            if each[3]['secondblockhash'] == data['content']['blockhash']:
+                                each[3]['secondcommit'] += 1
+                                each[3]['secondcommitlist'].append(data['content']['comid'])
+                                logcontent = 'Secondblock:' + str(each[3]['secondblockhash']) + ' receive a commit. Total:' + str(each[3]['secondcommit'])
+                                self.logger.info(logcontent)
 
                         # Receive enough commitment
-                        if (each[3]['secondcommit'] >= glovar.Secondcommem//2+1):
-#                            logcontent = 'Receive enough commitment for blocblock:' + str(each[3]['secondblockhash'])
-#                            self.logger.info(logcontent)
-                            self.broadSecondCommitBlock()
-                            self.addBlock(each[3]['newsecondblock'][0])
+                            if (each[3]['secondcommit'] >= glovar.Secondcommem//2+1):
+                                logcontent = 'Receive enough commitment for blocblock:' + str(each[3]['secondblockhash'])
+                                self.logger.info(logcontent)
+                                self.broadSecondCommitBlock()
+                                self.addBlock(each[3]['newsecondblock'][0])
 
         if data['type'] == 'secondblock' and data['No'] == 3:
 #            logcontent = 'Handle a commit secondblock:' + str(data['content']['block'][1])

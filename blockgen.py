@@ -180,25 +180,40 @@ class BlockProcessing(threading.Thread):
                     logcontent = 'Verify a commitment for block:' + str(data['content']['blockhash']) + ' from comid:' + str(data['content']['comid'])
                     self.logger.info(logcontent)
 
-                for each in glovar.ComList:
-                    if each[1] == self.cominfo[1]:
-                        if each[3]['genblock']:
-                            glovar.ComlistLock.acquire()
-                            each[3]['commit'] += 1
-                            each[3]['commitlist'].append(data['content']['comid'])
-                            glovar.ComlistLock.release()
-#                            logcontent = 'Block:' + str(each[3]['blockhash']) + ' receive a commit. Total:' + str(each[3]['commit'])
-#                            self.logger.info(logcontent)
+                    for each in glovar.ComList:
+                        if each[1] == self.cominfo[1]:
+                            if each[3]['genblock']:
+                                if data['content']['blockhash'] == each[3]['blockhash']:
+                                    each[3]['commit'] += 1
+                                    each[3]['commitlist'].append(data['content']['comid'])
+                                    logcontent = 'Block:' + str(each[3]['blockhash']) + ' receive a commit. Total:' + str(each[3]['commit'])
+                                    self.logger.info(logcontent)
 
-                            # Receive enough commitment
-                            if (each[3]['commit'] >= glovar.Firstcommem//2+1):
-#                                logcontent = 'Receive enough commitment for blocblock:' + str(each[3]['blockhash'])
-#                                self.logger.info(logcontent)
-                                self.broadFirstCommitBlock()
-                                self.addBlock(each[3]['newblock'][0])
-
-#                            logcontent = 'Run a new round to Generate a block'
-#                            self.logger.info(logcontent)
+                                    # Receive enough commitment
+                                    if (each[3]['commit'] >= glovar.Firstcommem//2+1):
+                                        logcontent = 'Receive enough commitment for blocblock:' + str(each[3]['blockhash'])
+                                        self.logger.info(logcontent)
+                                        self.broadFirstCommitBlock()
+                                        self.addBlock(each[3]['newblock'][0])
+#                for each in glovar.ComList:
+#                    if each[1] == self.cominfo[1]:
+#                        if each[3]['genblock']:
+#                            glovar.ComlistLock.acquire()
+#                            each[3]['commit'] += 1
+#                            each[3]['commitlist'].append(data['content']['comid'])
+#                            glovar.ComlistLock.release()
+##                            logcontent = 'Block:' + str(each[3]['blockhash']) + ' receive a commit. Total:' + str(each[3]['commit'])
+##                            self.logger.info(logcontent)
+#
+#                            # Receive enough commitment
+#                            if (each[3]['commit'] >= glovar.Firstcommem//2+1):
+##                                logcontent = 'Receive enough commitment for blocblock:' + str(each[3]['blockhash'])
+##                                self.logger.info(logcontent)
+#                                self.broadFirstCommitBlock()
+#                                self.addBlock(each[3]['newblock'][0])
+#
+##                            logcontent = 'Run a new round to Generate a block'
+##                            self.logger.info(logcontent)
 
             elif data['No'] == 3:
 #                logcontent = 'Handle a commit firstblock:' + str(data['content']['block'][4])
