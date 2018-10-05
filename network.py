@@ -198,7 +198,7 @@ class BroadMsg(threading.Thread):
                 #glovar.broadLock.release()
                 #self.logger.info('get a message from broadqueue.')
                 for each in  glovar.CONNECTION_LIST:
-                    time.sleep(random.uniform(0,0.1))
+#                    time.sleep(random.uniform(0,0.1))
                     each.senddata(sendmsg)
 #                    logcontent = 'Send message: ' + str(sendmsg) + ' to ' + str(each.addr)
 #                    self.logger.info(logcontent)
