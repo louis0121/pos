@@ -89,7 +89,7 @@ class Comselect(threading.Thread):
             newblock = glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)-1]
             senddata = {'messageid':newblock[1],'type':'syncblock','No':1,'content':newblock}
             glovar.messageLock.acquire()
-            glovar.MessageList.append(hashvalue)
+            glovar.MessageList.append(newblock[1])
             glovar.messageLock.release()
             broadMessage(senddata)
 
