@@ -37,7 +37,8 @@ class msghandle(threading.Thread):
 
             # The first time to receive this message
             if (data['messageid'] not in glovar.MessageList) and ((not glovar.ComChange) or \
-                        (glovar.ComChange and data['type'] == 'comrandom')) :
+                        (glovar.ComChange and (data['type'] == 'comrandom' or \
+                            data['type'] == 'syncblock'))) :
                 glovar.messageLock.acquire()
                 glovar.MessageList.append(data['messageid'])
                 glovar.messageLock.release()
@@ -64,6 +65,10 @@ class msghandle(threading.Thread):
                 # Receive a transaction 
                 elif data['type'] == 'transaction':
                     self.__transaction__handle(data)
+
+                # Receive a block for synchronous 
+                elif data['type'] == 'syncblock':
+                    self.__syncblock__handle(data)
 
                 # Unkown received data
                 else:
@@ -256,3 +261,19 @@ class msghandle(threading.Thread):
                     # glovar.ComlistLock.acquire()
                     each[4].put(data)
                     # glovar.ComlistLock.release()
+
+    # Handle the syncblock
+    def __syncblock__handle(self, data):
+        broadMessage(data)
+
+        glovar.blockchainLock.acquire()
+        if len(glovar.BLOCKCHAIN):
+            if glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)-1][8] < data['content'][8]:
+                glovar.BLOCKCHAIN.append(data['content']['block'])
+                logcontent = 'Add a synchronous secondblock with height:' + str(data['content'][8])
+                self.logger.info(logcontent)
+        else:
+            glovar.BLOCKCHAIN.append(data['content']['block'])
+            logcontent = 'Add a synchronous secondblock with height:' + str(data['content'][8])
+            self.logger.info(logcontent)
+        glovar.blockchainLock.release()

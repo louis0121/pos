@@ -84,6 +84,15 @@ class Comselect(threading.Thread):
 #        logcontent = "message queue number:" + str(msgnum) + " message queue after number:" + str(msgnumafter)
 #        self.logger.info(logcontent)
 
+        # Send the last block
+        if len(glovar.BLOCKCHAIN):
+            newblock = glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)-1]
+            senddata = {'messageid':newblock[1],'type':'syncblock','No':1,'content':newblock}
+            glovar.messageLock.acquire()
+            glovar.MessageList.append(hashvalue)
+            glovar.messageLock.release()
+            broadMessage(senddata)
+
         time.sleep(RANBROAD_TIME)
 
         cur_time = int(time.time())

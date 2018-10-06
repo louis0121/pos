@@ -194,6 +194,7 @@ class VerifyProcessing(threading.Thread):
                     prevhash = glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)-1][1]
                 else:
                     prevhash = 0
+                blockheight = len(glovar.BLOCKCHAIN) +1
                 glovar.blockchainLock.release()
                 randomstring += str(prevhash)
 
@@ -222,7 +223,7 @@ class VerifyProcessing(threading.Thread):
                     timestamp = time.time()
                     temp = str(prevhash) + str(self.cominfo[0]) + str(self.cominfo[1]) + str(self.cominfo[2]) + str(timestamp) + str(commitblocklist) + str(len(transactionlist))
                     hashvalue = hashlib.sha256(temp.encode('utf-8')).hexdigest()
-                    newblock = [prevhash,hashvalue,self.cominfo[0],self.cominfo[1],self.cominfo[2],timestamp,commitblocklist,transactionlist]
+                    newblock = [prevhash,hashvalue,self.cominfo[0],self.cominfo[1],self.cominfo[2],timestamp,commitblocklist,transactionlist, blockheight]
 
                     for each in glovar.ComList:
                         if self.cominfo[1] == each[1]:
