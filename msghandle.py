@@ -269,11 +269,11 @@ class msghandle(threading.Thread):
         glovar.blockchainLock.acquire()
         if len(glovar.BLOCKCHAIN):
             if glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)-1][8] < data['content'][8]:
-                glovar.BLOCKCHAIN.append(data['content']['block'])
+                glovar.BLOCKCHAIN.append(data['content'])
                 logcontent = 'Add a synchronous secondblock with height:' + str(data['content'][8])
                 self.logger.info(logcontent)
         else:
-            glovar.BLOCKCHAIN.append(data['content']['block'])
+            glovar.BLOCKCHAIN.append(data['content'])
             logcontent = 'Add a synchronous secondblock with height:' + str(data['content'][8])
             self.logger.info(logcontent)
         glovar.blockchainLock.release()
