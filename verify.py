@@ -82,16 +82,6 @@ class VerifyProcessing(threading.Thread):
                 logcontent = 'Verify a secondblock:' + str(blockdata[1]) + ' from comid:' + str(blockdata[3])
                 self.logger.info(logcontent)
 
-                # Change the corresponding global status
-#                for each in glovar.ComList:
-#                    if self.cominfo[1] == each[1]:
-#                        each[5].acquire()
-#                        if len(each[3]['newsecondblock']):
-#                            each[3]['newsecondblock'].clear()
-#
-#                        each[3]['newsecondblock'].append(blockdata)
-#                        each[5].release()
-#
                 # Send a commitment message
                 content = {'blockhash':blockdata[1],'incomno':self.cominfo[0],'comid':self.cominfo[1],'commit':1}
                 beforesend = {'type':'secondblock','No':2,'content':content}
@@ -207,8 +197,8 @@ class VerifyProcessing(threading.Thread):
                 glovar.blockchainLock.release()
                 randomstring += str(prevhash)
 
-#                logcontent = "randomstring:" + str(randomstring)
-#                self.logger.info(logcontent)
+                logcontent = "randomstring:" + str(randomstring)
+                self.logger.info(logcontent)
                 idchoose = int(hashlib.sha256(randomstring.encode('utf-8')).hexdigest(), 16) % len(self.cominfo[2])
 
                 logcontent = str(idchoose+1) + ' member: ' + \

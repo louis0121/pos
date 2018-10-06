@@ -195,23 +195,7 @@ class BlockProcessing(threading.Thread):
                                         self.logger.info(logcontent)
                                         self.broadFirstCommitBlock()
                                         self.addBlock(each[3]['newblock'][0])
-#                for each in glovar.ComList:
-#                    if each[1] == self.cominfo[1]:
-#                        if each[3]['genblock']:
-#                            glovar.ComlistLock.acquire()
-#                            each[3]['commit'] += 1
-#                            each[3]['commitlist'].append(data['content']['comid'])
-#                            glovar.ComlistLock.release()
-##                            logcontent = 'Block:' + str(each[3]['blockhash']) + ' receive a commit. Total:' + str(each[3]['commit'])
-##                            self.logger.info(logcontent)
-#
-#                            # Receive enough commitment
-#                            if (each[3]['commit'] >= glovar.Firstcommem//2+1):
-##                                logcontent = 'Receive enough commitment for blocblock:' + str(each[3]['blockhash'])
-##                                self.logger.info(logcontent)
-#                                self.broadFirstCommitBlock()
-#                                self.addBlock(each[3]['newblock'][0])
-#
+
 ##                            logcontent = 'Run a new round to Generate a block'
 ##                            self.logger.info(logcontent)
 
@@ -330,17 +314,13 @@ class BlockProcessing(threading.Thread):
         # Change the status of committee member
         for each in glovar.ComList:
             if each[1] == self.cominfo[1]:
-#                newblock = []
-#                commitlist = []
-#                commitblocklist = []
-#                comstatus = {'genblock':0,'blockhash':'0','stage':0,'commit':0,'commitlist':commitlist,'newblock':newblock,'verify':0,'commitblock':0,'commitblocklist':commitblocklist}
-                each[5].acquire()
+#                each[5].acquire()
                 each[3]['genblock'] = 0
                 each[3]['blockhash'] = '0'
                 each[3]['commit'] = 0
                 each[3]['commitlist'].clear()
                 each[3]['newblock'].clear()
-                each[5].release()
+#                each[5].release()
 
 #        self.logger.info('----------------------------------------------')
 #        logcontent = 'Choose a new leader to Generate a block'

@@ -75,8 +75,8 @@ class msghandle(threading.Thread):
     def __comrandom_handle(self, data):
         # Receive a random number
         if data['No'] == 1:
-            logcontent = 'Handle a random number:' + str(data['content']['genrandom'])
-            self.logger.info(logcontent)
+#            logcontent = 'Handle a random number:' + str(data['content']['genrandom'])
+#            self.logger.info(logcontent)
 
             glovar.ranLock.acquire()
             glovar.RanList.append(str(data['content']['genrandom']))
@@ -88,12 +88,7 @@ class msghandle(threading.Thread):
 #                self.logger.info(logcontent)
         # Receive a hashseed
         elif data['No'] == 2:
-            logcontent = ' Receive a hashvalue:' + str(data['content']['ranhash'])
-            self.logger.info(logcontent)
-#            msgnum = glovar.msgqueue.qsize()
-#            if glovar.msgqueue.empty():
-#                self.logger.info("The msgqueue is empty")
-#            logcontent = "Number of messages in the msgqueue is:" + str(msgnum)
+#            logcontent = ' Receive a hashvalue:' + str(data['content']['ranhash'])
 #            self.logger.info(logcontent)
 
             glovar.hashLock.acquire()
@@ -103,9 +98,9 @@ class msghandle(threading.Thread):
             broadMessage(data)
 
             if ( glovar.HashSeed == 0 or data['content']['ranhash'] < glovar.HashSeed ):
-                logcontent = "Replace HashSeed:\n" +str(glovar.HashSeed) + \
-                        " with hashvalue:\n" + str(data['content']['ranhash'])
-                self.logger.info(logcontent)
+#                logcontent = "Replace HashSeed:\n" +str(glovar.HashSeed) + \
+#                        " with hashvalue:\n" + str(data['content']['ranhash'])
+#                self.logger.info(logcontent)
                 glovar.hashLock.acquire()
                 glovar.HashSeed = data['content']['ranhash']
                 glovar.hashLock.release()
