@@ -87,11 +87,16 @@ class Comselect(threading.Thread):
         # Send the last block
         if len(glovar.BLOCKCHAIN):
             newblock = glovar.BLOCKCHAIN[len(glovar.BLOCKCHAIN)-1]
-            senddata = {'messageid':newblock[1],'type':'syncblock','No':1,'content':newblock}
+            beforesend = {'type':'syncblock','No':1,'content':newblock}
+            temp = str(beforesend)
+            hashvalue = hashlib.sha256(temp.encode('utf-8')).hexdigest()
+            senddata = {'messageid':hashvalue,'type':'syncblock','No':1,'content':newblock}
             glovar.messageLock.acquire()
             glovar.MessageList.append(newblock[1])
             glovar.messageLock.release()
             broadMessage(senddata)
+            logcontent = "Send a syncblock:" + str(newblock[8])
+            self.logger.info(logcontent)
 
         time.sleep(RANBROAD_TIME)
 

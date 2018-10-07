@@ -265,6 +265,9 @@ class msghandle(threading.Thread):
     # Handle the syncblock
     def __syncblock__handle(self, data):
         broadMessage(data)
+        logcontent = 'Receive a synchronous block:' + \
+        str(data['content'][8])
+        self.logger.info(logcontent)
 
         glovar.blockchainLock.acquire()
         if len(glovar.BLOCKCHAIN):
